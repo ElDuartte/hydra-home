@@ -5,6 +5,7 @@ services:
     network_mode: host
     volumes:
       - ./variables.json:/app/variables.json:ro
+      - ./src:/app/src:ro
     env_file:
       - .env
     depends_on:
@@ -17,9 +18,14 @@ services:
     pid: host
     privileged: true
     network_mode: host
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /etc/os-release:/etc/os-release:ro
+    tmpfs:
+      - /var/log:size=50M
+      - /tmp:size=50M
     environment:
-      - GLANCES_OPT=-w --bind 0.0.0.0 --disable-webui
+      - GLANCES_OPT=-w --bind 0.0.0.0 --disable-webui --disable-cups
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped

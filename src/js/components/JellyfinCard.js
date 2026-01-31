@@ -194,26 +194,10 @@ export class JellyfinCard extends BaseComponent {
             ${containerStatsHtml}
 
             <div class="jellyfin-stats">
-                <div class="jellyfin-stat">
-                    <span class="stat-icon">🎬</span>
-                    <span class="stat-label">Movies</span>
-                    <span class="stat-value">${movieCount.toLocaleString()}</span>
-                </div>
-                <div class="jellyfin-stat">
-                    <span class="stat-icon">📺</span>
-                    <span class="stat-label">Series</span>
-                    <span class="stat-value">${seriesCount.toLocaleString()}</span>
-                </div>
-                <div class="jellyfin-stat">
-                    <span class="stat-icon">🎵</span>
-                    <span class="stat-label">Songs</span>
-                    <span class="stat-value">${songCount.toLocaleString()}</span>
-                </div>
-                <div class="jellyfin-stat">
-                    <span class="stat-icon">💿</span>
-                    <span class="stat-label">Albums</span>
-                    <span class="stat-value">${albumCount.toLocaleString()}</span>
-                </div>
+                <div class="jellyfin-stat">🎬 ${movieCount.toLocaleString()}</div>
+                <div class="jellyfin-stat">📺 ${seriesCount.toLocaleString()}</div>
+                <div class="jellyfin-stat">🎵 ${songCount.toLocaleString()}</div>
+                <div class="jellyfin-stat">💿 ${albumCount.toLocaleString()}</div>
             </div>
 
             ${nowPlayingHtml}
@@ -231,24 +215,6 @@ export class JellyfinCard extends BaseComponent {
                     <span class="info-label">Episodes:</span>
                     <span class="info-value">${episodeCount.toLocaleString()}</span>
                 </div>
-            </div>
-
-            <div class="jellyfin-debug">
-                <details>
-                    <summary>Raw API Data</summary>
-                    <div class="debug-section">
-                        <h4>System Info</h4>
-                        <pre>${JSON.stringify(systemInfo, null, 2)}</pre>
-                    </div>
-                    <div class="debug-section">
-                        <h4>Sessions</h4>
-                        <pre>${JSON.stringify(sessions, null, 2)}</pre>
-                    </div>
-                    <div class="debug-section">
-                        <h4>Item Counts</h4>
-                        <pre>${JSON.stringify(itemCounts, null, 2)}</pre>
-                    </div>
-                </details>
             </div>
         `;
 

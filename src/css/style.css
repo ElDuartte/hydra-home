@@ -1008,23 +1008,16 @@ body {
 
 .jellyfin-stats {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: var(--spacing-sm);
 }
 
 .jellyfin-stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: var(--spacing-sm);
     background: var(--bg-secondary);
     border-radius: 8px;
     text-align: center;
-}
-
-.jellyfin-stat .stat-icon {
-    font-size: 1.5rem;
+    height: 50px;
+    justify-content: center;
 }
 
 .jellyfin-stat .stat-label {
@@ -1035,7 +1028,8 @@ body {
 }
 
 .jellyfin-stat .stat-value {
-    font-size: 1.25rem;
+    padding: 1rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
 }
