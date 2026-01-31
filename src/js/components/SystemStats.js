@@ -44,14 +44,14 @@ export class SystemStats extends BaseComponent {
 
             <div class="stat-card" id="disk-card">
                 <div class="stat-header">
-                    <span class="stat-label"><span class="stat-label-icon">💿</span> Discos</span>
+                    <span class="stat-label"><span class="stat-label-icon">💿</span> Disks</span>
                 </div>
                 <div class="disk-list" data-disk-list></div>
             </div>
 
             <div class="stat-card" id="temp-card">
                 <div class="stat-header">
-                    <span class="stat-label"><span class="stat-label-icon">🌡️</span> Temperaturas</span>
+                    <span class="stat-label"><span class="stat-label-icon">🌡️</span> Temperatures</span>
                 </div>
                 <div class="temp-list" data-temp-list></div>
             </div>
@@ -67,7 +67,7 @@ export class SystemStats extends BaseComponent {
 
             <div class="stat-card" id="network-card">
                 <div class="stat-header">
-                    <span class="stat-label"><span class="stat-label-icon">📡</span> Red</span>
+                    <span class="stat-label"><span class="stat-label-icon">📡</span> Network</span>
                 </div>
                 <div class="network-list" data-network-list></div>
             </div>
@@ -133,14 +133,23 @@ export class SystemStats extends BaseComponent {
 
     updateDisks(data) {
         if (!Array.isArray(data) || data.length === 0) {
-            this.$('[data-disk-list]').innerHTML = '<div class="no-data">Sin discos</div>';
+            this.$('[data-disk-list]').innerHTML = '<div class="no-data">No disks</div>';
             return;
         }
 
         const html = data
             .filter(d => {
                 const mount = d.mnt_point || d.mountpoint || '';
-                return !mount.startsWith('/boot') && !mount.includes('/snap/');
+                // Filter out system/virtual mounts
+                return !mount.startsWith('/boot') &&
+                       !mount.includes('/snap/') &&
+                       !mount.startsWith('/mnt/wsl') &&
+                       !mount.startsWith('/mnt/wslg') &&
+                       !mount.includes('/docker/') &&
+                       !mount.startsWith('/run/') &&
+                       !mount.startsWith('/dev/') &&
+                       !mount.startsWith('/sys/') &&
+                       mount !== '/init';
             })
             .map(d => {
                 const mount = d.mnt_point || d.mountpoint || 'Unknown';
@@ -160,12 +169,12 @@ export class SystemStats extends BaseComponent {
                 `;
             }).join('');
 
-        this.$('[data-disk-list]').innerHTML = html || '<div class="no-data">Sin discos</div>';
+        this.$('[data-disk-list]').innerHTML = html || '<div class="no-data">No disks</div>';
     }
 
     updateTemps(data) {
         if (!Array.isArray(data) || data.length === 0) {
-            this.$('[data-temp-list]').innerHTML = '<div class="no-data">Sin sensores</div>';
+            this.$('[data-temp-list]').innerHTML = '<div class="no-data">No sensors</div>';
             return;
         }
 
@@ -176,7 +185,7 @@ export class SystemStats extends BaseComponent {
         });
 
         if (temps.length === 0) {
-            this.$('[data-temp-list]').innerHTML = '<div class="no-data">Sin sensores</div>';
+            this.$('[data-temp-list]').innerHTML = '<div class="no-data">No sensors</div>';
             return;
         }
 
@@ -217,7 +226,7 @@ export class SystemStats extends BaseComponent {
         );
 
         if (interfaces.length === 0) {
-            this.$('[data-network-list]').innerHTML = '<div class="no-data">Sin interfaces</div>';
+            this.$('[data-network-list]').innerHTML = '<div class="no-data">No interfaces</div>';
             return;
         }
 

@@ -8,6 +8,8 @@ import { Weather, WeatherMini } from './components/Weather.js';
 import { SystemStats } from './components/SystemStats.js';
 import { DockerContainers } from './components/DockerContainers.js';
 import { WorldClocks } from './components/WorldClocks.js';
+import { ThemeSelector } from './components/ThemeSelector.js';
+import { applyTheme, getCurrentTheme } from './themes.js';
 
 class Dashboard {
     constructor() {
@@ -32,6 +34,11 @@ class Dashboard {
     }
 
     applyTheme() {
+        // Apply saved theme from localStorage or default to tokyo-night
+        const savedTheme = getCurrentTheme();
+        applyTheme(savedTheme);
+
+        // Also apply any custom theme overrides from config
         const root = document.documentElement;
         if (this.config.theme) {
             Object.entries(this.config.theme).forEach(([prop, value]) => {
@@ -63,6 +70,9 @@ class Dashboard {
 
     async initComponents() {
         const { config } = this;
+
+        // Theme selector (always shown)
+        await this.initComponent('theme-selector', ThemeSelector, {});
 
         // Clock (always shown)
         await this.initComponent('clock', Clock, config.clock);
