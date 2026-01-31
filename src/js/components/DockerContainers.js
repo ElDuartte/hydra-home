@@ -24,6 +24,8 @@ export class DockerContainers extends BaseComponent {
     async update() {
         const data = await this.glances.getDocker();
 
+        console.log('Docker API response:', data);
+
         if (!data) {
             this.renderError();
             return;
@@ -48,8 +50,10 @@ export class DockerContainers extends BaseComponent {
 
         // Sort: running first, then by name
         const sorted = containers.sort((a, b) => {
-            if (a.Status === 'running' && b.Status !== 'running') return -1;
-            if (b.Status === 'running' && a.Status !== 'running') return 1;
+            const aStatus = a.Status || a.status;
+            const bStatus = b.Status || b.status;
+            if (aStatus === 'running' && bStatus !== 'running') return -1;
+            if (bStatus === 'running' && aStatus !== 'running') return 1;
             return a.name.localeCompare(b.name);
         });
 
@@ -64,9 +68,14 @@ export class DockerContainers extends BaseComponent {
     }
 
     renderContainer(c) {
-        const isRunning = c.Status === 'running';
+        const status = c.Status || c.status;
+        const isRunning = status === 'running';
         const statusIcon = isRunning ? '🟢' : '🔴';
-        const image = c.Image?.split(':')[0]?.split('/').pop() || 'unknown';
+
+        // Handle both string and array format for image
+        let imageRaw = c.Image || c.image || 'unknown';
+        if (Array.isArray(imageRaw)) imageRaw = imageRaw[0] || 'unknown';
+        const image = imageRaw.split(':')[0].split('/').pop();
 
         if (!isRunning) {
             return `
@@ -83,7 +92,8 @@ export class DockerContainers extends BaseComponent {
 
         const cpu = c.cpu?.total?.toFixed(1) || '0.0';
         const mem = formatBytes(c.memory?.usage || 0);
-        const uptime = this.formatUptime(c.Uptime);
+        // Use uptime string directly if available, otherwise format from seconds
+        const uptime = c.uptime || this.formatUptime(c.Uptime);
 
         return `
             <div class="container-card running">

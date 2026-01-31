@@ -83,7 +83,7 @@ export class GlancesAPI {
      * Contenedores Docker
      */
     async getDocker() {
-        return await this.fetch('/docker');
+        return await this.fetch('/containers');
     }
 
     /**

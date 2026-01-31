@@ -161,7 +161,6 @@ body {
 .clock-greeting {
     font-size: 1.25rem;
     color: var(--accent-purple);
-    margin-top: var(--spacing-md);
     font-weight: 300;
 }
 
