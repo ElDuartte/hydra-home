@@ -22,7 +22,7 @@
   "clock": {
     "use24Hour": true,
     "showSeconds": true,
-    "locale": "es-ES"
+    "locale": "en-GB"
   },
 
   "theme": {
