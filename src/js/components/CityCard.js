@@ -72,12 +72,15 @@ export class CityCard extends BaseComponent {
         if (!weatherEl) return;
 
         weatherEl.innerHTML = `
+            <div class="city-time" data-city-time="bogota"></div>
             <div class="city-weather-main">
                 <span class="city-weather-icon">${icon}</span>
                 <span class="city-weather-temp">${temp}${unit}</span>
             </div>
-            <div class="city-weather-desc">${description}</div>
-            <div class="city-weather-humidity">💧 ${humidity}%</div>
+            <div class="city-weather-secondary">
+              <div class="city-weather-desc">${description}</div>
+              <div class="city-weather-humidity">💧 ${humidity}%</div>
+            </div>
         `;
     }
 
