@@ -64,11 +64,11 @@ app.get('/api/config', (req, res) => {
 });
 
 // API: Glances proxy (avoids CORS issues)
-app.get('/api/glances/*', async (req, res) => {
+app.get('/api/glances/:endpoint', async (req, res) => {
     try {
         const glancesUrl = process.env.GLANCES_URL || 'http://localhost:61208/api/4';
-        const endpoint = req.params[0]; // everything after /api/glances/
-        const url = `${glancesUrl.replace(/\/api\/\d+\/?$/, '')}/api/4/${endpoint}`;
+        const baseUrl = glancesUrl.replace(/\/api\/\d+\/?$/, '');
+        const url = `${baseUrl}/api/4/${req.params.endpoint}`;
 
         const response = await fetch(url);
         const data = await response.json();
