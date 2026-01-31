@@ -16,9 +16,56 @@ export class SystemStats extends BaseComponent {
 
     async init() {
         this.glances = new GlancesAPI(this.options.glancesUrl);
+        this.intervals = [];
         this.render();
         await this.update();
         this.startUpdates();
+    }
+
+    startUpdates() {
+        // Different update intervals for each metric
+        // CPU & CPU cores: every 15 seconds
+        this.intervals.push(setInterval(async () => {
+            const [cpu, percpu] = await Promise.all([
+                this.glances.getCpu(),
+                this.glances.getPerCpu(),
+            ]);
+            if (cpu) this.updateCpu(cpu);
+            if (percpu) this.updateCpuCores(percpu);
+        }, 15000));
+
+        // RAM: every 30 seconds
+        this.intervals.push(setInterval(async () => {
+            const mem = await this.glances.getMem();
+            if (mem) this.updateRam(mem);
+        }, 30000));
+
+        // Temperatures: every 30 seconds
+        this.intervals.push(setInterval(async () => {
+            const sensors = await this.glances.getSensors();
+            if (sensors) this.updateTemps(sensors);
+        }, 30000));
+
+        // Disks: every 1 hour
+        this.intervals.push(setInterval(async () => {
+            const fs = await this.glances.getFs();
+            if (fs) this.updateDisks(fs);
+        }, 3600000));
+
+        // Network & GPU: every 3 seconds (fast)
+        this.intervals.push(setInterval(async () => {
+            const [network, gpu] = await Promise.all([
+                this.glances.getNetwork(),
+                this.glances.getGpu(),
+            ]);
+            if (network) this.updateNetwork(network);
+            if (gpu?.length > 0) this.updateGpu(gpu);
+        }, 3000));
+    }
+
+    destroy() {
+        this.intervals.forEach(interval => clearInterval(interval));
+        this.intervals = [];
     }
 
     render() {

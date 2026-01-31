@@ -48,15 +48,7 @@ export class JellyfinCard extends BaseComponent {
             </div>
         `);
 
-        // Make card clickable
-        const card = this.$('.jellyfin-card');
-        card.style.cursor = 'pointer';
-        card.addEventListener('click', (e) => {
-            // Don't open if clicking on interactive elements
-            if (!e.target.closest('button, a')) {
-                window.open(this.jellyfinWebUrl, '_blank', 'noopener,noreferrer');
-            }
-        });
+        // Card is not clickable - removed click handler
     }
 
     async update() {

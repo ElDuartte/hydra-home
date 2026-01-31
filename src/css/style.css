@@ -397,6 +397,14 @@ body {
     justify-content: space-between;
     align-items: center;
     padding-bottom: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.containers-header .section-title {
+    margin: 0;
+    padding: 0;
+    border: none;
 }
 
 .containers-count {
@@ -891,13 +899,6 @@ body {
     border-radius: var(--border-radius);
     padding: var(--spacing-md);
     border: 1px solid var(--border-color);
-    transition: all 0.2s ease;
-}
-
-.jellyfin-card:hover {
-    border-color: #00a4dc;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px var(--shadow-color);
 }
 
 .jellyfin-header {
@@ -1264,31 +1265,41 @@ body {
     box-shadow: 0 4px 12px var(--shadow-color);
 }
 
-.theme-select {
+.theme-dropdown {
     position: absolute;
     bottom: 60px;
     right: 0;
     background: var(--bg-card);
-    color: var(--text-primary);
     border: 1px solid var(--border-color);
     border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    min-width: 180px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.theme-dropdown.visible {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+}
+
+.theme-select {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
     padding: 8px;
     font-size: 0.875rem;
     font-family: inherit;
     cursor: pointer;
     outline: none;
-    box-shadow: 0 4px 12px var(--shadow-color);
-    min-width: 150px;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(10px);
-    transition: all 0.2s ease;
-}
-
-.theme-select.visible {
-    opacity: 1;
-    pointer-events: all;
-    transform: translateY(0);
 }
 
 .theme-select:hover {
@@ -1299,4 +1310,21 @@ body {
     background: var(--bg-card);
     color: var(--text-primary);
     padding: 4px 8px;
+}
+
+.refresh-btn {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.refresh-btn:hover {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: var(--bg-primary);
 }

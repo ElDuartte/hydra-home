@@ -65,6 +65,7 @@ export class DockerContainers extends BaseComponent {
 
         this.html(`
             <div class="containers-header">
+                <h2 class="section-title">🐳 Docker</h2>
                 <span class="containers-count">${containers.length} container${containers.length !== 1 ? 's' : ''}</span>
             </div>
             <div class="containers-list">${html}</div>
@@ -81,12 +82,16 @@ export class DockerContainers extends BaseComponent {
         if (Array.isArray(imageRaw)) imageRaw = imageRaw[0] || 'unknown';
         const image = imageRaw.split(':')[0].split('/').pop();
 
+        // Container ID (shortened)
+        const shortId = (c.id || '').substring(0, 12);
+        const nameWithId = shortId ? `${c.name} - ${shortId}` : c.name;
+
         if (!isRunning) {
             return `
                 <div class="container-card stopped">
                     <div class="container-header">
                         <span class="container-status">${statusIcon}</span>
-                        <span class="container-name">${this.escape(c.name)}</span>
+                        <span class="container-name" title="${this.escape(c.id || '')}">${this.escape(nameWithId)}</span>
                     </div>
                     <div class="container-image">${this.escape(image)}</div>
                     <div class="container-stopped-label">Stopped</div>
@@ -102,9 +107,6 @@ export class DockerContainers extends BaseComponent {
         const io = c.io || {};
         const ioRead = this.formatIORate(io.ior || 0);
         const ioWrite = this.formatIORate(io.iow || 0);
-
-        // Container ID (shortened)
-        const shortId = (c.id || '').substring(0, 12);
 
         // Ports
         const ports = c.ports || '';
@@ -124,22 +126,15 @@ export class DockerContainers extends BaseComponent {
         }
 
         let metaHtml = '';
-        if (shortId || ports) {
-            metaHtml = '<div class="container-meta">';
-            if (shortId) {
-                metaHtml += `<span class="container-id" title="${this.escape(c.id || '')}">${this.escape(shortId)}</span>`;
-            }
-            if (ports) {
-                metaHtml += `<span class="container-ports">${this.escape(ports)}</span>`;
-            }
-            metaHtml += '</div>';
+        if (ports) {
+            metaHtml = `<div class="container-meta"><span class="container-ports">${this.escape(ports)}</span></div>`;
         }
 
         return `
             <div class="container-card running">
                 <div class="container-header">
                     <span class="container-status">${statusIcon}</span>
-                    <span class="container-name">${this.escape(c.name)}</span>
+                    <span class="container-name" title="${this.escape(c.id || '')}">${this.escape(nameWithId)}</span>
                 </div>
                 <div class="container-image">${this.escape(image)}</div>
                 <div class="container-stats">
