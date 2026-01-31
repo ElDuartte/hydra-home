@@ -62,7 +62,7 @@ body {
 .dashboard {
     display: grid;
     grid-template-columns: 1fr 1.2fr 1.2fr;
-    gap: var(--spacing-lg);
+    gap: 10px;
     padding: var(--spacing-lg);
     height: 100vh;
     max-width: 1920px;
@@ -78,7 +78,7 @@ body {
 .column {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: 10px;
     height: 100%;
     overflow-y: auto;
 }
@@ -961,7 +961,7 @@ body {
 .jellyfin-content {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: 10px;
 }
 
 .jellyfin-loading {
@@ -973,7 +973,7 @@ body {
 .jellyfin-container-stats {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-xs);
+    gap: 10px;
     padding: var(--spacing-sm);
     background: var(--bg-secondary);
     border-radius: 8px;
