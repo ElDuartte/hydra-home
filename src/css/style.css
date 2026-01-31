@@ -95,6 +95,7 @@ body {
     display: grid;
     grid-template-columns: 1.5fr 1fr;
     gap: 10px;
+    height: 200px;
 }
 
 .main-time-welcome {
@@ -127,7 +128,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    height: 150px;
+    height: 100px;
 }
 
 .city-card {
@@ -137,6 +138,7 @@ body {
     padding: 8px;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     gap: 6px;
 }
 
@@ -165,8 +167,8 @@ body {
 }
 
 .city-weather {
-  display: flex;
-  flex-direction: row; 
+    display: flex;
+    flex-direction: row;
 }
 
 .city-weather-main {
