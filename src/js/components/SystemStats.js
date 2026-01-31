@@ -16,9 +16,71 @@ export class SystemStats extends BaseComponent {
 
     async init() {
         this.glances = new GlancesAPI(this.options.glancesUrl);
+        this.intervals = [];
         this.render();
         await this.update();
         this.startUpdates();
+    }
+
+    async update() {
+        // Initial load - fetch all data immediately
+        const [cpu, mem, fs, sensors, gpu, network] = await Promise.all([
+            this.glances.getCpu(),
+            this.glances.getMem(),
+            this.glances.getFs(),
+            this.glances.getSensors(),
+            this.glances.getGpu(),
+            this.glances.getNetwork(),
+        ]);
+
+        if (cpu) this.updateCpu(cpu);
+        if (mem) this.updateRam(mem);
+        if (fs) this.updateDisks(fs);
+        if (sensors) this.updateTemps(sensors);
+        if (gpu?.length > 0) this.updateGpu(gpu);
+        if (network) this.updateNetwork(network);
+    }
+
+    startUpdates() {
+        // Different update intervals for each metric
+        // CPU: every 2 seconds (smooth updates)
+        this.intervals.push(setInterval(async () => {
+            const cpu = await this.glances.getCpu();
+            if (cpu) this.updateCpu(cpu);
+        }, 2000));
+
+        // RAM: every 1 second
+        this.intervals.push(setInterval(async () => {
+            const mem = await this.glances.getMem();
+            if (mem) this.updateRam(mem);
+        }, 1000));
+
+        // Temperatures: every 1 second
+        this.intervals.push(setInterval(async () => {
+            const sensors = await this.glances.getSensors();
+            if (sensors) this.updateTemps(sensors);
+        }, 1000));
+
+        // Disks: every 1 hour
+        this.intervals.push(setInterval(async () => {
+            const fs = await this.glances.getFs();
+            if (fs) this.updateDisks(fs);
+        }, 3600000));
+
+        // Network & GPU: every 3 seconds (fast)
+        this.intervals.push(setInterval(async () => {
+            const [network, gpu] = await Promise.all([
+                this.glances.getNetwork(),
+                this.glances.getGpu(),
+            ]);
+            if (network) this.updateNetwork(network);
+            if (gpu?.length > 0) this.updateGpu(gpu);
+        }, 3000));
+    }
+
+    destroy() {
+        this.intervals.forEach(interval => clearInterval(interval));
+        this.intervals = [];
     }
 
     render() {
@@ -30,7 +92,6 @@ export class SystemStats extends BaseComponent {
                 </div>
                 <div class="stat-bar"><div class="stat-bar-fill cpu" data-cpu-bar></div></div>
                 <div class="stat-details" data-cpu-details></div>
-                <div class="cpu-cores" data-cpu-cores></div>
             </div>
 
             <div class="stat-card" id="ram-card">
@@ -74,26 +135,6 @@ export class SystemStats extends BaseComponent {
         `);
     }
 
-    async update() {
-        const [cpu, percpu, mem, fs, sensors, gpu, network] = await Promise.all([
-            this.glances.getCpu(),
-            this.glances.getPerCpu(),
-            this.glances.getMem(),
-            this.glances.getFs(),
-            this.glances.getSensors(),
-            this.glances.getGpu(),
-            this.glances.getNetwork(),
-        ]);
-
-        if (cpu) this.updateCpu(cpu);
-        if (percpu) this.updateCpuCores(percpu);
-        if (mem) this.updateRam(mem);
-        if (fs) this.updateDisks(fs);
-        if (sensors) this.updateTemps(sensors);
-        if (gpu?.length > 0) this.updateGpu(gpu);
-        if (network) this.updateNetwork(network);
-    }
-
     updateCpu(data) {
         const percent = Math.round(data.total || 0);
         this.$('[data-cpu-value]').textContent = `${percent}%`;
@@ -105,20 +146,6 @@ export class SystemStats extends BaseComponent {
         if (data.system) details.push(`Sys: ${data.system.toFixed(1)}%`);
         if (data.cpucore) details.push(`${data.cpucore} cores`);
         this.$('[data-cpu-details]').textContent = details.join(' | ');
-    }
-
-    updateCpuCores(data) {
-        const html = data.map(core => {
-            const percent = Math.round(100 - (core.idle || 0));
-            const num = core.cpu_number + 1;
-            return `
-                <div class="cpu-core" title="Core ${num}: ${percent}%">
-                    <div class="cpu-core-bar ${percent > 80 ? 'high' : ''}" style="height:${percent}%"></div>
-                    <span class="cpu-core-num">${num}</span>
-                </div>
-            `;
-        }).join('');
-        this.$('[data-cpu-cores]').innerHTML = html;
     }
 
     updateRam(data) {
@@ -149,6 +176,29 @@ export class SystemStats extends BaseComponent {
         });
 
         const uniqueDisks = Array.from(deviceMap.values());
+
+        // Calculate combined disk usage
+        let totalSpace = 0;
+        let totalUsed = 0;
+        uniqueDisks.forEach(d => {
+            totalSpace += d.size || d.total || 0;
+            totalUsed += d.used || 0;
+        });
+        const combinedPercent = totalSpace > 0 ? Math.round((totalUsed / totalSpace) * 100) : 0;
+
+        // Update disk card header with combined usage
+        const diskCard = this.$('#disk-card');
+        const header = diskCard.querySelector('.stat-header');
+
+        // Add or update the combined percentage value
+        let valueSpan = header.querySelector('.stat-value');
+        if (!valueSpan) {
+            valueSpan = document.createElement('span');
+            valueSpan.className = 'stat-value';
+            valueSpan.setAttribute('data-disk-value', '');
+            header.appendChild(valueSpan);
+        }
+        valueSpan.textContent = `${combinedPercent}%`;
 
         const html = uniqueDisks
             .map((d, index) => {

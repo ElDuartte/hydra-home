@@ -9,20 +9,46 @@
 <body>
     <div id="theme-selector" class="theme-selector-container"></div>
     <div class="dashboard">
-        <!-- Left Column: Docker Containers -->
+        <!-- Left Column: Jellyfin & Docker Containers -->
         <aside class="column column-left">
-            <h2 class="section-title">🐳 Docker</h2>
+            <div id="jellyfin-card"></div>
             <div id="docker-containers" class="docker-containers"></div>
         </aside>
 
-        <!-- Center Column: Clock, Weather, World Clocks -->
+        <!-- Center Column: 3-Row Layout -->
         <main class="column column-center">
-            <div>
-                <div id="clock" class="clock-container"></div>
-                <div id="weather" class="weather-container"></div>
-                <div class="weather-cities"></div>
+            <!-- Row 1: Main Time/Welcome + Main Weather -->
+            <div class="center-row-1">
+                <div class="main-time-welcome">
+                    <div id="clock" class="clock-container"></div>
+                    <div class="welcome-message">Welcome back!</div>
+                </div>
+                <div class="main-weather">
+                    <div id="weather" class="weather-container"></div>
+                </div>
             </div>
-            <div id="world-clocks" class="world-clocks"></div>
+
+            <!-- Row 2: Austin + Bogotá (Weather + Time combined) -->
+            <div class="center-row-2">
+                <div class="city-card" id="city-card-austin">
+                    <div class="city-card-header">Austin</div>
+                    <div class="city-card-content">
+                        <div class="city-time" data-city-time="austin"></div>
+                        <div class="city-weather" data-city-weather="austin"></div>
+                    </div>
+                </div>
+                <div class="city-card" id="city-card-bogota">
+                    <div class="city-card-header">Bogotá</div>
+                    <div class="city-card-content">
+                                                <div class="city-weather" data-city-weather="bogota"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: Jellyfin Now Playing -->
+            <div class="center-row-3">
+                <div id="jellyfin-now-playing" class="jellyfin-now-playing"></div>
+            </div>
         </main>
 
         <!-- Right Column: System Stats -->

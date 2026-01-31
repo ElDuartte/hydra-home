@@ -19,6 +19,7 @@ function loadVariables() {
         clockCities: [],
         clock: { use24Hour: true, showSeconds: true, locale: 'es-ES' },
         theme: {},
+        jellyfin: { enabled: false },
     };
 
     try {
@@ -55,6 +56,12 @@ function getConfig() {
         weatherCities: vars.weatherCities || [],
         clockCities: vars.clockCities || [],
         theme,
+        jellyfin: {
+            enabled: vars.jellyfin?.enabled || false,
+            url: process.env.JELLYFIN_URL || 'http://localhost:8096',
+            webUrl: process.env.JELLYFIN_WEB_URL || process.env.JELLYFIN_URL || 'http://localhost:8096',
+            apiKey: process.env.JELLYFIN_API_KEY || '',
+        },
     };
 }
 
@@ -88,8 +95,39 @@ app.get('/api/weather', async (req, res) => {
             return res.status(500).json({ error: 'Missing WEATHER_API_KEY in .env' });
         }
 
-        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${units}&appid=${apiKey}&lang=es`;
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${units}&appid=${apiKey}&lang=en`;
         const response = await fetch(url);
+        const data = await response.json();
+
+        if (!response.ok) {
+            return res.status(response.status).json(data);
+        }
+
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// API: Jellyfin proxy (avoids CORS and hides API key)
+app.get('/api/jellyfin/*', async (req, res) => {
+    try {
+        const jellyfinUrl = process.env.JELLYFIN_URL || 'http://localhost:8096';
+        const apiKey = process.env.JELLYFIN_API_KEY;
+
+        if (!apiKey) {
+            return res.status(500).json({ error: 'Missing JELLYFIN_API_KEY in .env' });
+        }
+
+        // Extract the endpoint path after /api/jellyfin/
+        const endpoint = req.params[0];
+        const url = `${jellyfinUrl}/${endpoint}`;
+
+        const headers = {
+            'X-Emby-Token': apiKey,
+        };
+
+        const response = await fetch(url, { headers });
         const data = await response.json();
 
         if (!response.ok) {

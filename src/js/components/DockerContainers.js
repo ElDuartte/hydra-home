@@ -34,7 +34,13 @@ export class DockerContainers extends BaseComponent {
 
     renderContainers(data) {
         // Handle both API v3 (data.containers) and v4 (data is array) formats
-        const containers = Array.isArray(data) ? data : (data.containers || []);
+        let containers = Array.isArray(data) ? data : (data.containers || []);
+
+        // Filter out Jellyfin container (it has its own special card)
+        containers = containers.filter(c => {
+            const name = (c.name || '').toLowerCase();
+            return !name.includes('jellyfin');
+        });
 
         if (containers.length === 0) {
             this.html(`
@@ -59,6 +65,7 @@ export class DockerContainers extends BaseComponent {
 
         this.html(`
             <div class="containers-header">
+                <h2 class="section-title">🐳 Docker</h2>
                 <span class="containers-count">${containers.length} container${containers.length !== 1 ? 's' : ''}</span>
             </div>
             <div class="containers-list">${html}</div>
@@ -75,6 +82,10 @@ export class DockerContainers extends BaseComponent {
         if (Array.isArray(imageRaw)) imageRaw = imageRaw[0] || 'unknown';
         const image = imageRaw.split(':')[0].split('/').pop();
 
+        // Container ID (shortened)
+        const shortId = (c.id || '').substring(0, 12);
+        const imageWithId = shortId ? `${image} - ${shortId}` : image;
+
         if (!isRunning) {
             return `
                 <div class="container-card stopped">
@@ -82,7 +93,7 @@ export class DockerContainers extends BaseComponent {
                         <span class="container-status">${statusIcon}</span>
                         <span class="container-name">${this.escape(c.name)}</span>
                     </div>
-                    <div class="container-image">${this.escape(image)}</div>
+                    <div class="container-image" title="${this.escape(c.id || '')}">${this.escape(imageWithId)}</div>
                     <div class="container-stopped-label">Stopped</div>
                 </div>
             `;
@@ -90,8 +101,34 @@ export class DockerContainers extends BaseComponent {
 
         const cpu = c.cpu?.total?.toFixed(1) || '0.0';
         const mem = formatBytes(c.memory?.usage || 0);
-        // Use uptime string directly if available, otherwise format from seconds
         const uptime = c.uptime || this.formatUptime(c.Uptime);
+
+        // I/O rates
+        const io = c.io || {};
+        const ioRead = this.formatIORate(io.ior || 0);
+        const ioWrite = this.formatIORate(io.iow || 0);
+
+        // Ports
+        const ports = c.ports || '';
+
+        let statsHtml = `
+            <div class="container-stat"><span class="stat-icon">⚡</span> ${cpu}%</div>
+            <div class="container-stat"><span class="stat-icon">💾</span> ${mem}</div>
+            <div class="container-stat"><span class="stat-icon">⏱️</span> ${uptime}</div>
+        `;
+
+        // Add I/O if available
+        if (io.ior !== undefined || io.iow !== undefined) {
+            statsHtml += `
+                <div class="container-stat"><span class="stat-icon">📥</span> ${ioRead}</div>
+                <div class="container-stat"><span class="stat-icon">📤</span> ${ioWrite}</div>
+            `;
+        }
+
+        let metaHtml = '';
+        if (ports) {
+            metaHtml = `<div class="container-meta"><span class="container-ports">${this.escape(ports)}</span></div>`;
+        }
 
         return `
             <div class="container-card running">
@@ -99,14 +136,24 @@ export class DockerContainers extends BaseComponent {
                     <span class="container-status">${statusIcon}</span>
                     <span class="container-name">${this.escape(c.name)}</span>
                 </div>
-                <div class="container-image">${this.escape(image)}</div>
+                <div class="container-image" title="${this.escape(c.id || '')}">${this.escape(imageWithId)}</div>
                 <div class="container-stats">
-                    <div class="container-stat"><span class="stat-icon">⚡</span> ${cpu}%</div>
-                    <div class="container-stat"><span class="stat-icon">💾</span> ${mem}</div>
-                    <div class="container-stat"><span class="stat-icon">⏱️</span> ${uptime}</div>
+                    ${statsHtml}
                 </div>
+                ${metaHtml}
             </div>
         `;
+    }
+
+    formatIORate(bytesPerSec) {
+        if (!bytesPerSec) return '0 B/s';
+        const units = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
+        let i = 0;
+        while (bytesPerSec >= 1024 && i < units.length - 1) {
+            bytesPerSec /= 1024;
+            i++;
+        }
+        return `${bytesPerSec.toFixed(1)} ${units[i]}`;
     }
 
     renderError() {

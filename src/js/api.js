@@ -1,12 +1,12 @@
 /**
- * API Module - Funciones fetch genéricas
+ * API Module - Generic fetch functions
  */
 
 /**
- * Realiza una petición GET genérica
- * @param {string} url - URL de la API
- * @param {Object} options - Opciones adicionales para fetch
- * @returns {Promise<Object>} - Datos JSON parseados
+ * Performs a generic GET request
+ * @param {string} url - API URL
+ * @param {Object} options - Additional options for fetch
+ * @returns {Promise<Object>} - Parsed JSON data
  */
 export async function fetchJSON(url, options = {}) {
     const defaultOptions = {
@@ -35,7 +35,7 @@ export async function fetchJSON(url, options = {}) {
 }
 
 /**
- * Custom Error para APIs
+ * Custom Error for APIs
  */
 export class ApiError extends Error {
     constructor(message, statusCode) {
@@ -46,9 +46,9 @@ export class ApiError extends Error {
 }
 
 /**
- * Obtiene datos del clima via server proxy (hides API key)
- * @param {Object} params - Parámetros de configuración
- * @returns {Promise<Object>} - Datos del clima
+ * Fetches weather data via server proxy (hides API key)
+ * @param {Object} params - Configuration parameters
+ * @returns {Promise<Object>} - Weather data
  */
 export async function fetchWeather({ lat, lon, units = 'metric' }) {
     const url = `/api/weather?lat=${lat}&lon=${lon}&units=${units}`;
@@ -56,10 +56,10 @@ export async function fetchWeather({ lat, lon, units = 'metric' }) {
 }
 
 /**
- * Construye URL con query params
- * @param {string} baseUrl - URL base
- * @param {Object} params - Parámetros query
- * @returns {string} - URL completa
+ * Builds URL with query params
+ * @param {string} baseUrl - Base URL
+ * @param {Object} params - Query parameters
+ * @returns {string} - Complete URL
  */
 export function buildUrl(baseUrl, params) {
     const url = new URL(baseUrl);
@@ -88,9 +88,9 @@ export function formatBytes(bytes) {
 }
 
 /**
- * Convierte código de icono de OpenWeatherMap a emoji
- * @param {string} iconCode - Código del icono (ej: '01d')
- * @returns {string} - Emoji correspondiente
+ * Converts OpenWeatherMap icon code to emoji
+ * @param {string} iconCode - Icon code (e.g., '01d')
+ * @returns {string} - Corresponding emoji
  */
 export function getWeatherEmoji(iconCode) {
     const iconMap = {

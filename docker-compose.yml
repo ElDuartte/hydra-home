@@ -5,6 +5,7 @@ services:
     network_mode: host
     volumes:
       - ./variables.json:/app/variables.json:ro
+      - ./src:/app/src:ro
     env_file:
       - .env
     depends_on:
@@ -21,5 +22,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/os-release:/etc/os-release:ro
     environment:
-      - GLANCES_OPT=-w --bind 0.0.0.0 --disable-webui
+      - GLANCES_OPT=-w --bind 0.0.0.0 --disable-webui --quiet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "2"
     restart: unless-stopped
