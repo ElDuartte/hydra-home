@@ -34,7 +34,8 @@ Create a `.env` file in the project root:
 WEATHER_API_KEY=your_openweathermap_api_key_here
 
 # Jellyfin Integration (optional)
-JELLYFIN_URL=http://192.168.1.58:8096
+JELLYFIN_URL=http://localhost:8096
+JELLYFIN_WEB_URL=http://192.168.1.58:8096
 JELLYFIN_API_KEY=your_jellyfin_api_key_here
 
 # Glances API (leave as default)
@@ -48,7 +49,8 @@ PORT=42069
 **Important**:
 - Replace `your_openweathermap_api_key_here` with your actual OpenWeatherMap API key
 - For Jellyfin integration:
-  - Replace `http://192.168.1.58:8096` with your Jellyfin server URL
+  - `JELLYFIN_URL`: Use `http://localhost:8096` (for server-side API calls)
+  - `JELLYFIN_WEB_URL`: Use `http://YOUR_SERVER_IP:8096` (for opening in browser when you click the card)
   - Replace `your_jellyfin_api_key_here` with your Jellyfin API key
 
 ### 3. Configure Dashboard Settings
@@ -114,15 +116,16 @@ Edit `variables.json` to customize your dashboard:
 
 - `jellyfin`: Jellyfin media server integration (optional)
   - `enabled`: Set to `true` to show Jellyfin card, `false` to hide
-  - URL and API key are configured in `.env` file:
-    - `JELLYFIN_URL`: URL to your Jellyfin server (e.g., `http://192.168.1.58:8096`)
+  - Configuration is in `.env` file:
+    - `JELLYFIN_URL`: Internal URL for API calls (use `http://localhost:8096` if Jellyfin is on same server)
+    - `JELLYFIN_WEB_URL`: External URL for browser access (e.g., `http://192.168.1.58:8096`)
     - `JELLYFIN_API_KEY`: Your Jellyfin API key
       - To get an API key:
-        1. Open Jellyfin web interface
+        1. Open Jellyfin web interface at `http://YOUR_SERVER_IP:8096`
         2. Go to Dashboard → API Keys
         3. Click "+" to create a new key
         4. Copy the key and add it to your `.env` file
-  - **Note**: If Jellyfin is running as a Docker container, it will automatically be hidden from the regular Docker container list and shown in the special Jellyfin card instead, which displays both container stats and Jellyfin library information
+  - **Note**: If Jellyfin is running as a Docker container, it will automatically be hidden from the regular Docker container list and shown in the special Jellyfin card instead, which displays both container stats (CPU, memory, uptime) and Jellyfin library information (movies, series, active streams)
 
 ### 4. Configure Firewall
 

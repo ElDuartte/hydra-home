@@ -96,6 +96,7 @@ class Dashboard {
         if (config.jellyfin?.enabled) {
             await this.initComponent('jellyfin-card', JellyfinCard, {
                 url: config.jellyfin.url,
+                webUrl: config.jellyfin.webUrl,
                 apiKey: config.jellyfin.apiKey,
                 glancesUrl: config.glances.url,
             });

@@ -10,6 +10,7 @@ export class JellyfinCard extends BaseComponent {
     defaults() {
         return {
             url: 'http://localhost:8096',
+            webUrl: 'http://localhost:8096',
             apiKey: '',
             glancesUrl: 'http://localhost:61208/api/3',
             updateInterval: 5000, // 5 seconds
@@ -17,7 +18,8 @@ export class JellyfinCard extends BaseComponent {
     }
 
     async init() {
-        this.jellyfinUrl = this.options.url;
+        this.jellyfinUrl = this.options.url; // For API calls via proxy
+        this.jellyfinWebUrl = this.options.webUrl; // For browser access
         this.apiKey = this.options.apiKey;
         this.glances = new GlancesAPI(this.options.glancesUrl);
         this.render();
@@ -52,7 +54,7 @@ export class JellyfinCard extends BaseComponent {
         card.addEventListener('click', (e) => {
             // Don't open if clicking on interactive elements
             if (!e.target.closest('button, a')) {
-                window.open(this.jellyfinUrl, '_blank', 'noopener,noreferrer');
+                window.open(this.jellyfinWebUrl, '_blank', 'noopener,noreferrer');
             }
         });
     }
@@ -94,12 +96,12 @@ export class JellyfinCard extends BaseComponent {
     }
 
     async fetchJellyfin(endpoint) {
-        const url = `${this.jellyfinUrl}${endpoint}`;
-        const headers = {
-            'X-Emby-Token': this.apiKey,
-        };
+        // Use server proxy to avoid CORS issues
+        // Remove leading slash if present
+        const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
+        const url = `/api/jellyfin/${cleanEndpoint}`;
 
-        const response = await fetch(url, { headers });
+        const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }
