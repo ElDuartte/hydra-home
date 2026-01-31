@@ -22,9 +22,30 @@ export class SystemStats extends BaseComponent {
         this.startUpdates();
     }
 
+    async update() {
+        // Initial load - fetch all data immediately
+        const [cpu, percpu, mem, fs, sensors, gpu, network] = await Promise.all([
+            this.glances.getCpu(),
+            this.glances.getPerCpu(),
+            this.glances.getMem(),
+            this.glances.getFs(),
+            this.glances.getSensors(),
+            this.glances.getGpu(),
+            this.glances.getNetwork(),
+        ]);
+
+        if (cpu) this.updateCpu(cpu);
+        if (percpu) this.updateCpuCores(percpu);
+        if (mem) this.updateRam(mem);
+        if (fs) this.updateDisks(fs);
+        if (sensors) this.updateTemps(sensors);
+        if (gpu?.length > 0) this.updateGpu(gpu);
+        if (network) this.updateNetwork(network);
+    }
+
     startUpdates() {
         // Different update intervals for each metric
-        // CPU & CPU cores: every 15 seconds
+        // CPU & CPU cores: every 2 seconds
         this.intervals.push(setInterval(async () => {
             const [cpu, percpu] = await Promise.all([
                 this.glances.getCpu(),
@@ -32,19 +53,19 @@ export class SystemStats extends BaseComponent {
             ]);
             if (cpu) this.updateCpu(cpu);
             if (percpu) this.updateCpuCores(percpu);
-        }, 15000));
+        }, 2000));
 
-        // RAM: every 30 seconds
+        // RAM: every 2 seconds
         this.intervals.push(setInterval(async () => {
             const mem = await this.glances.getMem();
             if (mem) this.updateRam(mem);
-        }, 30000));
+        }, 2000));
 
-        // Temperatures: every 30 seconds
+        // Temperatures: every 2 seconds
         this.intervals.push(setInterval(async () => {
             const sensors = await this.glances.getSensors();
             if (sensors) this.updateTemps(sensors);
-        }, 30000));
+        }, 2000));
 
         // Disks: every 1 hour
         this.intervals.push(setInterval(async () => {

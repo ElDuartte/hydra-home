@@ -586,6 +586,7 @@ body {
     font-weight: 600;
     color: var(--text-primary);
     font-variant-numeric: tabular-nums;
+    transition: color 0.3s ease;
 }
 
 .stat-details {
@@ -604,7 +605,7 @@ body {
 .stat-bar-fill {
     height: 100%;
     border-radius: 3px;
-    transition: width 0.3s ease;
+    transition: width 0.8s ease;
 }
 
 .stat-bar-fill.cpu {
@@ -636,7 +637,7 @@ body {
     width: 100%;
     background: linear-gradient(0deg, var(--accent-blue), var(--accent-cyan));
     border-radius: 2px 2px 0 0;
-    transition: height 0.3s ease;
+    transition: height 0.8s ease;
     min-height: 2px;
 }
 
@@ -738,6 +739,7 @@ body {
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .temp-item.warning .temp-value {
@@ -814,6 +816,7 @@ body {
     .system-stats {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
     }
 }
 

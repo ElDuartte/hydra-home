@@ -84,16 +84,16 @@ export class DockerContainers extends BaseComponent {
 
         // Container ID (shortened)
         const shortId = (c.id || '').substring(0, 12);
-        const nameWithId = shortId ? `${c.name} - ${shortId}` : c.name;
+        const imageWithId = shortId ? `${image} - ${shortId}` : image;
 
         if (!isRunning) {
             return `
                 <div class="container-card stopped">
                     <div class="container-header">
                         <span class="container-status">${statusIcon}</span>
-                        <span class="container-name" title="${this.escape(c.id || '')}">${this.escape(nameWithId)}</span>
+                        <span class="container-name">${this.escape(c.name)}</span>
                     </div>
-                    <div class="container-image">${this.escape(image)}</div>
+                    <div class="container-image" title="${this.escape(c.id || '')}">${this.escape(imageWithId)}</div>
                     <div class="container-stopped-label">Stopped</div>
                 </div>
             `;
@@ -134,9 +134,9 @@ export class DockerContainers extends BaseComponent {
             <div class="container-card running">
                 <div class="container-header">
                     <span class="container-status">${statusIcon}</span>
-                    <span class="container-name" title="${this.escape(c.id || '')}">${this.escape(nameWithId)}</span>
+                    <span class="container-name">${this.escape(c.name)}</span>
                 </div>
-                <div class="container-image">${this.escape(image)}</div>
+                <div class="container-image" title="${this.escape(c.id || '')}">${this.escape(imageWithId)}</div>
                 <div class="container-stats">
                     ${statsHtml}
                 </div>
