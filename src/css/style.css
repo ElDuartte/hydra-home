@@ -1013,11 +1013,13 @@ body {
 }
 
 .jellyfin-stat {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: var(--bg-secondary);
     border-radius: 8px;
     text-align: center;
     height: 50px;
-    justify-content: center;
 }
 
 .jellyfin-stat .stat-label {
