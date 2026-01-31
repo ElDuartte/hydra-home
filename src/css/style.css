@@ -456,7 +456,8 @@ body {
 
 .container-stats {
     display: flex;
-    gap: var(--spacing-md);
+    flex-wrap: wrap;
+    gap: var(--spacing-xs) var(--spacing-md);
     margin-top: var(--spacing-xs);
     padding-top: var(--spacing-xs);
     border-top: 1px solid var(--border-color);
@@ -472,6 +473,25 @@ body {
 
 .container-stat .stat-icon {
     font-size: 0.65rem;
+}
+
+.container-meta {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+    padding-top: var(--spacing-xs);
+    border-top: 1px solid var(--border-color);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-family: monospace;
+}
+
+.container-id {
+    cursor: help;
+}
+
+.container-ports {
+    color: var(--accent-cyan);
 }
 
 .container-stopped-label {
@@ -590,35 +610,37 @@ body {
     margin-top: var(--spacing-sm);
     padding-top: var(--spacing-xs);
     border-top: 1px solid var(--border-color);
-    height: 50px;
+    height: 60px;
     align-items: flex-end;
 }
 
 .cpu-core {
     flex: 1;
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
     align-items: center;
     height: 100%;
     position: relative;
+    justify-content: flex-start;
 }
 
 .cpu-core-bar {
     width: 100%;
-    background: linear-gradient(180deg, var(--accent-cyan), var(--accent-blue));
+    background: linear-gradient(0deg, var(--accent-blue), var(--accent-cyan));
     border-radius: 2px 2px 0 0;
     transition: height 0.3s ease;
     min-height: 2px;
 }
 
 .cpu-core-bar.high {
-    background: linear-gradient(180deg, var(--accent-red), var(--accent-orange));
+    background: linear-gradient(0deg, var(--accent-orange), var(--accent-red));
 }
 
 .cpu-core-num {
     font-size: 0.55rem;
     color: var(--text-muted);
     margin-top: 2px;
+    line-height: 1;
 }
 
 .stat-bar-fill.ram {
@@ -862,6 +884,276 @@ body {
 }
 
 /* ========================================
+   Jellyfin Card Component
+   ======================================== */
+.jellyfin-card {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.jellyfin-card:hover {
+    border-color: #00a4dc;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px var(--shadow-color);
+}
+
+.jellyfin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.jellyfin-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.jellyfin-logo {
+    width: 24px;
+    height: 24px;
+}
+
+.jellyfin-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.jellyfin-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+}
+
+.status-dot.online {
+    background: var(--accent-green);
+    box-shadow: 0 0 8px var(--accent-green);
+}
+
+.status-dot.offline {
+    background: var(--accent-red);
+}
+
+.status-text {
+    color: var(--text-secondary);
+}
+
+.jellyfin-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.jellyfin-loading {
+    text-align: center;
+    padding: var(--spacing-md);
+    color: var(--text-muted);
+}
+
+.jellyfin-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+}
+
+.jellyfin-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: var(--spacing-sm);
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.jellyfin-stat .stat-icon {
+    font-size: 1.5rem;
+}
+
+.jellyfin-stat .stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.jellyfin-stat .stat-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.jellyfin-section {
+    margin-top: var(--spacing-sm);
+}
+
+.jellyfin-section-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xs);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.jellyfin-session {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+    border-left: 3px solid #00a4dc;
+}
+
+.session-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.session-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.session-metadata {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.playback-progress {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-top: 6px;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--bg-primary);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00a4dc, var(--accent-cyan));
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    min-width: 35px;
+    text-align: right;
+}
+
+.jellyfin-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    font-size: 0.75rem;
+}
+
+.jellyfin-info-item {
+    display: flex;
+    justify-content: space-between;
+}
+
+.info-label {
+    color: var(--text-muted);
+}
+
+.info-value {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.jellyfin-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-md);
+    color: var(--accent-red);
+    text-align: center;
+}
+
+.jellyfin-error .error-icon {
+    font-size: 2rem;
+}
+
+.jellyfin-debug {
+    margin-top: var(--spacing-sm);
+    font-size: 0.7rem;
+}
+
+.jellyfin-debug details {
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    padding: var(--spacing-xs);
+}
+
+.jellyfin-debug summary {
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 4px;
+    user-select: none;
+}
+
+.jellyfin-debug summary:hover {
+    color: var(--text-secondary);
+}
+
+.jellyfin-debug .debug-section {
+    margin-top: var(--spacing-xs);
+}
+
+.jellyfin-debug h4 {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin: var(--spacing-xs) 0 4px 0;
+}
+
+.jellyfin-debug pre {
+    background: var(--bg-primary);
+    padding: var(--spacing-xs);
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* ========================================
    World Clocks Component
    ======================================== */
 .world-clocks {
@@ -905,50 +1197,69 @@ body {
    ======================================== */
 .theme-selector-container {
     position: fixed;
-    top: var(--spacing-sm);
+    bottom: var(--spacing-sm);
     right: var(--spacing-sm);
     z-index: 1000;
 }
 
 .theme-selector {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 8px 12px;
-    box-shadow: 0 2px 8px var(--shadow-color);
+    position: relative;
 }
 
-.theme-label {
-    font-size: 1.25rem;
-    cursor: default;
+.theme-toggle {
+    width: 48px;
+    height: 48px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    border-color: var(--accent-blue);
+    box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .theme-select {
-    background: var(--bg-tertiary);
+    position: absolute;
+    bottom: 60px;
+    right: 0;
+    background: var(--bg-card);
     color: var(--text-primary);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 4px 8px;
+    border-radius: 8px;
+    padding: 8px;
     font-size: 0.875rem;
     font-family: inherit;
     cursor: pointer;
     outline: none;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    min-width: 150px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
     transition: all 0.2s ease;
+}
+
+.theme-select.visible {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
 }
 
 .theme-select:hover {
     border-color: var(--accent-blue);
 }
 
-.theme-select:focus {
-    border-color: var(--accent-purple);
-    box-shadow: 0 0 0 2px rgba(187, 154, 247, 0.2);
-}
-
 .theme-select option {
     background: var(--bg-card);
     color: var(--text-primary);
+    padding: 4px 8px;
 }

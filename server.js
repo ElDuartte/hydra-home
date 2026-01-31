@@ -19,6 +19,7 @@ function loadVariables() {
         clockCities: [],
         clock: { use24Hour: true, showSeconds: true, locale: 'es-ES' },
         theme: {},
+        jellyfin: { enabled: false, url: 'http://localhost:8096', apiKey: '' },
     };
 
     try {
@@ -55,6 +56,7 @@ function getConfig() {
         weatherCities: vars.weatherCities || [],
         clockCities: vars.clockCities || [],
         theme,
+        jellyfin: vars.jellyfin || { enabled: false, url: 'http://localhost:8096', apiKey: '' },
     };
 }
 

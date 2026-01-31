@@ -23,6 +23,7 @@ export async function loadConfig() {
             weatherCities: [],
             clockCities: [],
             theme: {},
+            jellyfin: { enabled: false, url: 'http://localhost:8096', apiKey: '' },
         };
     }
 }
@@ -35,4 +36,5 @@ export const config = {
     weatherCities: [],
     clockCities: [],
     theme: {},
+    jellyfin: { enabled: false, url: 'http://localhost:8096', apiKey: '' },
 };

@@ -9,6 +9,7 @@ import { SystemStats } from './components/SystemStats.js';
 import { DockerContainers } from './components/DockerContainers.js';
 import { WorldClocks } from './components/WorldClocks.js';
 import { ThemeSelector } from './components/ThemeSelector.js';
+import { JellyfinCard } from './components/JellyfinCard.js';
 import { applyTheme, getCurrentTheme } from './themes.js';
 
 class Dashboard {
@@ -90,6 +91,14 @@ class Dashboard {
             glancesUrl: config.glances.url,
             updateInterval: config.glances.updateInterval,
         });
+
+        // Jellyfin card (if enabled)
+        if (config.jellyfin?.enabled) {
+            await this.initComponent('jellyfin-card', JellyfinCard, {
+                url: config.jellyfin.url,
+                apiKey: config.jellyfin.apiKey,
+            });
+        }
 
         // System stats
         await this.initComponent('system-stats', SystemStats, {

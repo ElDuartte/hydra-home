@@ -25,7 +25,7 @@ export class ThemeSelector extends BaseComponent {
 
         this.html(`
             <div class="theme-selector">
-                <label for="theme-select" class="theme-label">🎨</label>
+                <button class="theme-toggle" id="theme-toggle" title="Change theme">⚙️</button>
                 <select id="theme-select" class="theme-select">
                     ${options}
                 </select>
@@ -34,11 +34,25 @@ export class ThemeSelector extends BaseComponent {
     }
 
     attachEventListeners() {
+        const toggle = this.$('#theme-toggle');
         const select = this.$('#theme-select');
+
+        toggle.addEventListener('click', () => {
+            select.classList.toggle('visible');
+        });
+
         select.addEventListener('change', (e) => {
             const themeId = e.target.value;
             applyTheme(themeId);
             this.currentTheme = themeId;
+            select.classList.remove('visible');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!this.container.contains(e.target)) {
+                select.classList.remove('visible');
+            }
         });
     }
 }

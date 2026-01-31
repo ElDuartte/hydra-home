@@ -90,8 +90,44 @@ export class DockerContainers extends BaseComponent {
 
         const cpu = c.cpu?.total?.toFixed(1) || '0.0';
         const mem = formatBytes(c.memory?.usage || 0);
-        // Use uptime string directly if available, otherwise format from seconds
         const uptime = c.uptime || this.formatUptime(c.Uptime);
+
+        // I/O rates
+        const io = c.io || {};
+        const ioRead = this.formatIORate(io.ior || 0);
+        const ioWrite = this.formatIORate(io.iow || 0);
+
+        // Container ID (shortened)
+        const shortId = (c.id || '').substring(0, 12);
+
+        // Ports
+        const ports = c.ports || '';
+
+        let statsHtml = `
+            <div class="container-stat"><span class="stat-icon">⚡</span> ${cpu}%</div>
+            <div class="container-stat"><span class="stat-icon">💾</span> ${mem}</div>
+            <div class="container-stat"><span class="stat-icon">⏱️</span> ${uptime}</div>
+        `;
+
+        // Add I/O if available
+        if (io.ior !== undefined || io.iow !== undefined) {
+            statsHtml += `
+                <div class="container-stat"><span class="stat-icon">📥</span> ${ioRead}</div>
+                <div class="container-stat"><span class="stat-icon">📤</span> ${ioWrite}</div>
+            `;
+        }
+
+        let metaHtml = '';
+        if (shortId || ports) {
+            metaHtml = '<div class="container-meta">';
+            if (shortId) {
+                metaHtml += `<span class="container-id" title="${this.escape(c.id || '')}">${this.escape(shortId)}</span>`;
+            }
+            if (ports) {
+                metaHtml += `<span class="container-ports">${this.escape(ports)}</span>`;
+            }
+            metaHtml += '</div>';
+        }
 
         return `
             <div class="container-card running">
@@ -101,12 +137,22 @@ export class DockerContainers extends BaseComponent {
                 </div>
                 <div class="container-image">${this.escape(image)}</div>
                 <div class="container-stats">
-                    <div class="container-stat"><span class="stat-icon">⚡</span> ${cpu}%</div>
-                    <div class="container-stat"><span class="stat-icon">💾</span> ${mem}</div>
-                    <div class="container-stat"><span class="stat-icon">⏱️</span> ${uptime}</div>
+                    ${statsHtml}
                 </div>
+                ${metaHtml}
             </div>
         `;
+    }
+
+    formatIORate(bytesPerSec) {
+        if (!bytesPerSec) return '0 B/s';
+        const units = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
+        let i = 0;
+        while (bytesPerSec >= 1024 && i < units.length - 1) {
+            bytesPerSec /= 1024;
+            i++;
+        }
+        return `${bytesPerSec.toFixed(1)} ${units[i]}`;
     }
 
     renderError() {

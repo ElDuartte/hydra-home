@@ -78,6 +78,12 @@ Edit `variables.json` to customize your dashboard:
     "--bg-card": "#1a1f3a",
     "--accent-blue": "#00d4ff",
     "--accent-purple": "#b74dff"
+  },
+
+  "jellyfin": {
+    "enabled": true,
+    "url": "http://localhost:8096",
+    "apiKey": "YOUR_JELLYFIN_API_KEY_HERE"
   }
 }
 ```
@@ -99,6 +105,16 @@ Edit `variables.json` to customize your dashboard:
   - `locale`: Language/region for date formatting (e.g., `en-US`, `es-ES`)
 
 - `theme`: Custom CSS color variables (leave empty `""` to use defaults)
+
+- `jellyfin`: Jellyfin media server integration (optional)
+  - `enabled`: Set to `true` to show Jellyfin card, `false` to hide
+  - `url`: URL to your Jellyfin server (e.g., `http://192.168.1.58:8096`)
+  - `apiKey`: Your Jellyfin API key
+    - To get an API key:
+      1. Open Jellyfin web interface
+      2. Go to Dashboard → API Keys
+      3. Click "+" to create a new key
+      4. Copy the key and paste it here
 
 ### 4. Configure Firewall
 

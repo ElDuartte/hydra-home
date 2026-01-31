@@ -150,6 +150,29 @@ export class SystemStats extends BaseComponent {
 
         const uniqueDisks = Array.from(deviceMap.values());
 
+        // Calculate combined disk usage
+        let totalSpace = 0;
+        let totalUsed = 0;
+        uniqueDisks.forEach(d => {
+            totalSpace += d.size || d.total || 0;
+            totalUsed += d.used || 0;
+        });
+        const combinedPercent = totalSpace > 0 ? Math.round((totalUsed / totalSpace) * 100) : 0;
+
+        // Update disk card header with combined usage
+        const diskCard = this.$('#disk-card');
+        const header = diskCard.querySelector('.stat-header');
+
+        // Add or update the combined percentage value
+        let valueSpan = header.querySelector('.stat-value');
+        if (!valueSpan) {
+            valueSpan = document.createElement('span');
+            valueSpan.className = 'stat-value';
+            valueSpan.setAttribute('data-disk-value', '');
+            header.appendChild(valueSpan);
+        }
+        valueSpan.textContent = `${combinedPercent}%`;
+
         const html = uniqueDisks
             .map((d, index) => {
                 const mount = d.mnt_point || d.mountpoint || '';
