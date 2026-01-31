@@ -86,7 +86,7 @@ body {
 .column-center {
     overflow: hidden;
     display: grid;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: 275px 130px auto;
     gap: 10px;
 }
 
@@ -153,8 +153,9 @@ body {
 }
 
 .city-card-content {
-    display: grid;
-    grid-template-columns(1fr, 1fr, 1fr);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     gap: 10px;
 }
 
@@ -169,18 +170,21 @@ body {
 .city-weather {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    gap: 8px;
 }
 
 .city-weather-main {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 6px;
 }
 
 .city-weather-secondary {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
 }
 
 .city-weather-icon {
