@@ -683,6 +683,7 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: var(--spacing-xs);
+    flex-wrap: nowrap;
 }
 
 .container-status {
@@ -693,17 +694,13 @@ body {
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
 }
 
 .container-image {
     font-size: 0.7rem;
     color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
+    margin-top: 0;
+    margin-left: 0;
 }
 
 .container-stats {
@@ -730,12 +727,13 @@ body {
 .container-meta {
     display: flex;
     gap: var(--spacing-xs);
-    margin-top: var(--spacing-xs);
-    padding-top: var(--spacing-xs);
-    border-top: 1px solid var(--border-color);
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
     font-size: 0.65rem;
     color: var(--text-muted);
     font-family: monospace;
+    align-items: center;
 }
 
 .container-id {
