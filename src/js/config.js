@@ -17,7 +17,7 @@ export async function loadConfig() {
         console.error('Config load error:', error);
         // Return defaults if API fails
         return {
-            glances: { url: 'http://localhost:61208/api/4', updateInterval: 3000 },
+            glances: { url: '/api/glances', updateInterval: 3000 },
             location: { city: 'Madrid', lat: 40.4168, lon: -3.7038, units: 'metric' },
             clock: { use24Hour: true, showSeconds: true, locale: 'es-ES' },
             weatherCities: [],
@@ -29,7 +29,7 @@ export async function loadConfig() {
 
 // For backward compatibility - sync access (use loadConfig() for async)
 export const config = {
-    glances: { url: 'http://localhost:61208/api/4', updateInterval: 3000 },
+    glances: { url: '/api/glances', updateInterval: 3000 },
     location: { city: 'Madrid', lat: 40.4168, lon: -3.7038, units: 'metric' },
     clock: { use24Hour: true, showSeconds: true, locale: 'es-ES' },
     weatherCities: [],
