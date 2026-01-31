@@ -63,15 +63,15 @@ export class Weather extends BaseComponent {
             </div>
             <div class="weather-details">
                 <div class="weather-detail">
-                    <div class="weather-detail-label">Sensación</div>
+                    <div class="weather-detail-label">Feels like</div>
                     <div class="weather-detail-value">${feelsLike}${unit}</div>
                 </div>
                 <div class="weather-detail">
-                    <div class="weather-detail-label">Humedad</div>
+                    <div class="weather-detail-label">Humidity</div>
                     <div class="weather-detail-value">${humidity}%</div>
                 </div>
                 <div class="weather-detail">
-                    <div class="weather-detail-label">Viento</div>
+                    <div class="weather-detail-label">Wind</div>
                     <div class="weather-detail-value">${windSpeed} km/h</div>
                 </div>
             </div>
@@ -90,8 +90,8 @@ export class Weather extends BaseComponent {
             <div class="weather-mini-temp">${temp}<span class="weather-mini-unit">${unit}</span></div>
             <div class="weather-mini-desc">${description}</div>
             <div class="weather-mini-details">
-                <span>Sensación: ${feelsLike}${unit}</span>
-                <span>Humedad: ${humidity}%</span>
+                <span>Feels like: ${feelsLike}${unit}</span>
+                <span>Humidity: ${humidity}%</span>
             </div>
         `);
     }

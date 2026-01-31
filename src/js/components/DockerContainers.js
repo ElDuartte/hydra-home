@@ -33,13 +33,14 @@ export class DockerContainers extends BaseComponent {
     }
 
     renderContainers(data) {
-        const containers = data.containers || [];
+        // Handle both API v3 (data.containers) and v4 (data is array) formats
+        const containers = Array.isArray(data) ? data : (data.containers || []);
 
         if (containers.length === 0) {
             this.html(`
                 <div class="no-containers">
                     <span class="no-containers-icon">📦</span>
-                    <span>No hay contenedores activos</span>
+                    <span>No active containers</span>
                 </div>
             `);
             return;
@@ -56,7 +57,7 @@ export class DockerContainers extends BaseComponent {
 
         this.html(`
             <div class="containers-header">
-                <span class="containers-count">${containers.length} contenedores</span>
+                <span class="containers-count">${containers.length} container${containers.length !== 1 ? 's' : ''}</span>
             </div>
             <div class="containers-list">${html}</div>
         `);
@@ -75,7 +76,7 @@ export class DockerContainers extends BaseComponent {
                         <span class="container-name">${this.escape(c.name)}</span>
                     </div>
                     <div class="container-image">${this.escape(image)}</div>
-                    <div class="container-stopped-label">Detenido</div>
+                    <div class="container-stopped-label">Stopped</div>
                 </div>
             `;
         }

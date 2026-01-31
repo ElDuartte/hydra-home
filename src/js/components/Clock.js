@@ -54,8 +54,8 @@ export class Clock extends BaseComponent {
     }
 
     getGreeting(hour) {
-        if (hour >= 5 && hour < 12) return '☀️ Buenos días';
-        if (hour >= 12 && hour < 19) return '🌤️ Buenas tardes';
-        return '🌙 Buenas noches';
+        if (hour >= 5 && hour < 12) return '☀️ Good morning';
+        if (hour >= 12 && hour < 19) return '🌤️ Good afternoon';
+        return '🌙 Good night';
     }
 }
