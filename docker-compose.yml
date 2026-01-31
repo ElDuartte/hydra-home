@@ -3,7 +3,9 @@ services:
     build: .
     container_name: hydra-dashboard
     ports:
-      - "8080:3000"
+      - "42069:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./variables.json:/app/variables.json:ro
     env_file:
