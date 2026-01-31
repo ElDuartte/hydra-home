@@ -143,13 +143,27 @@ export class SystemStats extends BaseComponent {
             device: d.device_name
         })));
 
-        const html = data
-            .filter(d => {
-                const mount = d.mnt_point || d.mountpoint || '';
+        // Group by device to avoid showing multiple bind mounts of the same disk
+        const deviceMap = new Map();
+        data.forEach(d => {
+            const device = d.device_name;
+            const mount = d.mnt_point || d.mountpoint || '';
 
-                // Only show root filesystem - represents the entire main drive
-                return mount === '/';
-            })
+            // Skip file-based bind mounts
+            if (mount.includes('/etc/') || mount.includes('/usr/lib/') ||
+                mount.match(/\.(conf|json|yml|yaml|xml|sock)$/)) {
+                return;
+            }
+
+            // Keep the first valid mount point for each device
+            if (!deviceMap.has(device)) {
+                deviceMap.set(device, d);
+            }
+        });
+
+        const uniqueDisks = Array.from(deviceMap.values());
+
+        const html = uniqueDisks
             .map(d => {
                 const mount = d.mnt_point || d.mountpoint || 'Unknown';
                 const total = d.size || d.total || 0;

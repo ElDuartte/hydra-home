@@ -38,6 +38,8 @@ export class DockerContainers extends BaseComponent {
         // Handle both API v3 (data.containers) and v4 (data is array) formats
         const containers = Array.isArray(data) ? data : (data.containers || []);
 
+        console.log('Rendering containers:', containers.length, 'containers');
+
         if (containers.length === 0) {
             this.html(`
                 <div class="no-containers">
@@ -57,7 +59,16 @@ export class DockerContainers extends BaseComponent {
             return a.name.localeCompare(b.name);
         });
 
-        const html = sorted.map(c => this.renderContainer(c)).join('');
+        const html = sorted.map(c => {
+            try {
+                return this.renderContainer(c);
+            } catch (err) {
+                console.error('Error rendering container:', c.name, err);
+                return '';
+            }
+        }).join('');
+
+        console.log('Rendered HTML length:', html.length);
 
         this.html(`
             <div class="containers-header">
