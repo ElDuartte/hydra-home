@@ -1017,18 +1017,46 @@ body {
    Responsive Design
    ======================================== */
 @media (max-width: 1400px) {
+    body {
+        height: auto;
+        overflow: auto;
+    }
+
     .dashboard {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+        padding-bottom: 80px;
+    }
+
+    .column {
+        order: 3;
+        height: auto;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .column-center {
+        order: 1;
+        height: auto;
+        overflow: visible;
     }
 
     .column-right {
-        grid-column: span 2;
+        order: 2;
+        height: auto;
+        overflow: visible;
     }
 
     .system-stats {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
+    }
+
+    .jellyfin-status .status-text {
+        display: none;
     }
 }
 
