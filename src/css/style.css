@@ -1033,19 +1033,28 @@ body {
 }
 
 @media (max-width: 900px) {
+    body {
+        height: auto;
+        overflow: auto;
+    }
+
     .dashboard {
         grid-template-columns: 1fr;
         padding: var(--spacing-sm);
-        overflow-y: auto;
-        overflow-x: hidden;
+        padding-bottom: 80px;
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
     }
 
     .column {
         max-height: none;
+        height: auto;
         order: 3;
         flex-shrink: 0;
         min-width: 0;
         width: 100%;
+        overflow: visible;
     }
 
     .column-center {
@@ -1053,6 +1062,30 @@ body {
         flex-shrink: 0;
         min-width: 0;
         width: 100%;
+        max-width: 100%;
+        height: auto;
+        overflow-x: hidden;
+        display: grid;
+        grid-template-rows: auto auto auto;
+        gap: 10px;
+    }
+
+    .center-row-1 {
+        height: auto;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .center-row-2 {
+        height: auto;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .center-row-3 {
+        height: auto;
+        min-height: 100px;
+        max-width: 100%;
     }
 
     .column-right {
@@ -1061,6 +1094,8 @@ body {
         flex-shrink: 0;
         min-width: 0;
         width: 100%;
+        height: auto;
+        overflow: visible;
     }
 
     .system-stats {
