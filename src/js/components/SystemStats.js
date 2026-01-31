@@ -176,9 +176,18 @@ export class SystemStats extends BaseComponent {
     }
 
     updateCpuCores(data) {
+        if (!data || !Array.isArray(data)) return;
+
         const html = data.map(core => {
-            const percent = Math.round(100 - (core.idle || 0));
-            const num = core.cpu_number + 1;
+            // Calculate usage from idle percentage, with safety checks
+            let percent = 0;
+            if (core.idle !== undefined && core.idle !== null) {
+                percent = Math.max(0, Math.min(100, Math.round(100 - core.idle)));
+            } else if (core.total !== undefined) {
+                percent = Math.max(0, Math.min(100, Math.round(core.total)));
+            }
+
+            const num = (core.cpu_number ?? 0) + 1;
             return `
                 <div class="cpu-core" title="Core ${num}: ${percent}%">
                     <div class="cpu-core-bar ${percent > 80 ? 'high' : ''}" style="height:${percent}%"></div>
