@@ -1088,6 +1088,24 @@ body {
         max-width: 100%;
     }
 
+    .jellyfin-card {
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .jellyfin-header {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .jellyfin-status {
+        flex-shrink: 0;
+    }
+
+    .jellyfin-status .status-text {
+        display: none;
+    }
+
     .column-right {
         grid-column: span 1;
         order: 2;
