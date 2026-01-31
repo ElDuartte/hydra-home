@@ -24,8 +24,6 @@ export class DockerContainers extends BaseComponent {
     async update() {
         const data = await this.glances.getDocker();
 
-        console.log('Docker API response:', data);
-
         if (!data) {
             this.renderError();
             return;
@@ -37,8 +35,6 @@ export class DockerContainers extends BaseComponent {
     renderContainers(data) {
         // Handle both API v3 (data.containers) and v4 (data is array) formats
         const containers = Array.isArray(data) ? data : (data.containers || []);
-
-        console.log('Rendering containers:', containers.length, 'containers');
 
         if (containers.length === 0) {
             this.html(`
@@ -59,16 +55,7 @@ export class DockerContainers extends BaseComponent {
             return a.name.localeCompare(b.name);
         });
 
-        const html = sorted.map(c => {
-            try {
-                return this.renderContainer(c);
-            } catch (err) {
-                console.error('Error rendering container:', c.name, err);
-                return '';
-            }
-        }).join('');
-
-        console.log('Rendered HTML length:', html.length);
+        const html = sorted.map(c => this.renderContainer(c)).join('');
 
         this.html(`
             <div class="containers-header">

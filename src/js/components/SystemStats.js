@@ -137,26 +137,13 @@ export class SystemStats extends BaseComponent {
             return;
         }
 
-        console.log('All disks from Glances:', data.map(d => ({
-            mount: d.mnt_point || d.mountpoint,
-            size: d.size || d.total,
-            device: d.device_name
-        })));
-
-        // Group by device to avoid showing multiple bind mounts of the same disk
+        // Group by device to show only one entry per physical disk
+        // This avoids showing multiple bind mounts from Docker containers
         const deviceMap = new Map();
         data.forEach(d => {
             const device = d.device_name;
-            const mount = d.mnt_point || d.mountpoint || '';
-
-            // Skip file-based bind mounts
-            if (mount.includes('/etc/') || mount.includes('/usr/lib/') ||
-                mount.match(/\.(conf|json|yml|yaml|xml|sock)$/)) {
-                return;
-            }
-
-            // Keep the first valid mount point for each device
-            if (!deviceMap.has(device)) {
+            // Keep only the first mount for each unique device
+            if (device && !deviceMap.has(device)) {
                 deviceMap.set(device, d);
             }
         });
@@ -164,15 +151,33 @@ export class SystemStats extends BaseComponent {
         const uniqueDisks = Array.from(deviceMap.values());
 
         const html = uniqueDisks
-            .map(d => {
-                const mount = d.mnt_point || d.mountpoint || 'Unknown';
+            .map((d, index) => {
+                const mount = d.mnt_point || d.mountpoint || '';
+                const device = d.device_name || '';
                 const total = d.size || d.total || 0;
                 const used = d.used || 0;
                 const percent = total > 0 ? Math.round((used / total) * 100) : 0;
+
+                // Generate a friendly disk name
+                let diskName;
+                if (mount === '/' || mount === '') {
+                    // Primary/root filesystem
+                    diskName = 'System Drive';
+                } else if (mount.startsWith('/home')) {
+                    diskName = 'Home';
+                } else if (mount.startsWith('/mnt/')) {
+                    // Extract mount name from /mnt/xxx
+                    diskName = mount.split('/')[2] || 'Drive';
+                } else {
+                    // Extract device name from path (e.g., /dev/sda2 -> sda2)
+                    const deviceMatch = device.match(/\/dev\/(.+)$/);
+                    diskName = deviceMatch ? deviceMatch[1].toUpperCase() : `Drive ${index + 1}`;
+                }
+
                 return `
                     <div class="disk-item">
                         <div class="disk-header">
-                            <span class="disk-mount">${mount}</span>
+                            <span class="disk-mount">${diskName}</span>
                             <span class="disk-usage">${formatBytes(used)} / ${formatBytes(total)}</span>
                         </div>
                         <div class="stat-bar">
