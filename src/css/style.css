@@ -128,7 +128,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    height: 100px;
+    height: 50px;
 }
 
 .city-card {
@@ -663,6 +663,10 @@ body {
     padding: var(--spacing-sm);
     border: 1px solid var(--border-color);
     transition: all 0.2s ease;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: var(--spacing-xs);
 }
 
 .container-card:hover {
@@ -681,9 +685,9 @@ body {
 .container-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: var(--spacing-xs);
-    flex-wrap: nowrap;
+    grid-column: 1;
+    grid-row: 1;
 }
 
 .container-status {
@@ -701,6 +705,12 @@ body {
     color: var(--text-muted);
     margin-top: 0;
     margin-left: 0;
+    white-space: nowrap;
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .container-stats {
@@ -710,6 +720,8 @@ body {
     margin-top: var(--spacing-xs);
     padding-top: var(--spacing-xs);
     border-top: 1px solid var(--border-color);
+    grid-column: 1 / -1;
+    grid-row: 2;
 }
 
 .container-stat {
@@ -725,23 +737,19 @@ body {
 }
 
 .container-meta {
-    display: flex;
-    gap: var(--spacing-xs);
-    margin-top: 0;
-    padding-top: 0;
-    border-top: none;
-    font-size: 0.65rem;
-    color: var(--text-muted);
-    font-family: monospace;
-    align-items: center;
+    display: contents;
 }
 
 .container-id {
     cursor: help;
+    grid-column: 2;
+    grid-row: 1;
 }
 
 .container-ports {
     color: var(--accent-cyan);
+    grid-column: 1 / -1;
+    grid-row: 3;
 }
 
 .container-stopped-label {
@@ -1323,6 +1331,7 @@ body {
 .jellyfin-info-card {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
     gap: 6px;
     padding: 10px;
     background: var(--bg-secondary);
