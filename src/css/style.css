@@ -63,7 +63,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1.2fr 1.2fr;
     gap: 10px;
-    padding: var(--spacing-lg);
+    padding: 15px 15px 0 15px;
     height: 100vh;
     max-width: 1920px;
     margin: 0 auto;
@@ -85,6 +85,190 @@ body {
 
 .column-center {
     overflow: hidden;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: 10px;
+}
+
+/* Center Column Row 1: Main Time/Welcome + Main Weather */
+.center-row-1 {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 10px;
+}
+
+.main-time-welcome {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.welcome-message {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    text-align: center;
+}
+
+.main-weather {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    padding: var(--spacing-md);
+}
+
+/* Center Column Row 2: Austin + Bogotá */
+.center-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.city-card {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.city-card-header {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.city-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.city-time {
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--text-primary);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.city-weather {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.city-weather-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.city-weather-icon {
+    font-size: 2.5rem;
+}
+
+.city-weather-temp {
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--text-primary);
+}
+
+.city-weather-desc {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-transform: capitalize;
+}
+
+.city-weather-humidity {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.city-weather-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+/* Center Column Row 3: Jellyfin Now Playing */
+.center-row-3 {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    padding: var(--spacing-md);
+    overflow-y: auto;
+}
+
+.jellyfin-now-playing {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.now-playing-header {
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.now-playing-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+}
+
+.now-playing-sessions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.now-playing-session {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: var(--spacing-sm);
+    border-left: 3px solid #00a4dc;
+}
+
+.now-playing-empty,
+.now-playing-error,
+.now-playing-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: var(--spacing-lg);
+    color: var(--text-muted);
+}
+
+.empty-icon,
+.error-icon {
+    font-size: 3rem;
+}
+
+.empty-text,
+.error-message {
+    font-size: 0.875rem;
 }
 
 .column::-webkit-scrollbar {
@@ -135,6 +319,11 @@ body {
     padding: var(--spacing-lg);
 }
 
+/* When inside main-time-welcome, remove padding */
+.main-time-welcome .clock-container {
+    padding: 0;
+}
+
 .clock-time {
     font-size: 4.5rem;
     font-weight: 200;
@@ -171,6 +360,29 @@ body {
     border-radius: var(--border-radius);
     padding: var(--spacing-md);
     border: 1px solid var(--border-color);
+}
+
+/* When inside main-weather, remove duplicate card styling */
+.main-weather .weather-container {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+/* Adjust weather display for smaller main-weather container */
+.main-weather .weather-icon {
+    font-size: 2.5rem;
+}
+
+.main-weather .weather-temp {
+    font-size: 2rem;
+}
+
+.main-weather .weather-details {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
 }
 
 .weather-main {
@@ -609,46 +821,6 @@ body {
 
 .stat-bar-fill.cpu {
     background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
-}
-
-/* CPU Cores visualization */
-.cpu-cores {
-    display: flex;
-    gap: 4px;
-    margin-top: var(--spacing-sm);
-    padding-top: var(--spacing-xs);
-    border-top: 1px solid var(--border-color);
-    height: 60px;
-    align-items: flex-end;
-}
-
-.cpu-core {
-    flex: 1;
-    display: flex;
-    flex-direction: column-reverse;
-    align-items: center;
-    height: 100%;
-    position: relative;
-    justify-content: flex-start;
-}
-
-.cpu-core-bar {
-    width: 100%;
-    background: linear-gradient(0deg, var(--accent-blue), var(--accent-cyan));
-    border-radius: 2px 2px 0 0;
-    transition: height 0.8s ease;
-    min-height: 2px;
-}
-
-.cpu-core-bar.high {
-    background: linear-gradient(0deg, var(--accent-orange), var(--accent-red));
-}
-
-.cpu-core-num {
-    font-size: 0.55rem;
-    color: var(--text-muted);
-    margin-top: 2px;
-    line-height: 1;
 }
 
 .stat-bar-fill.ram {
@@ -1202,7 +1374,7 @@ body {
 .world-clocks {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: var(--spacing-sm);
+    gap: 10px;
     margin-top: auto;
 }
 

@@ -10,6 +10,8 @@ import { DockerContainers } from './components/DockerContainers.js';
 import { WorldClocks } from './components/WorldClocks.js';
 import { ThemeSelector } from './components/ThemeSelector.js';
 import { JellyfinCard } from './components/JellyfinCard.js';
+import { JellyfinNowPlaying } from './components/JellyfinNowPlaying.js';
+import { CityCard } from './components/CityCard.js';
 import { applyTheme, getCurrentTheme } from './themes.js';
 
 class Dashboard {
@@ -49,24 +51,8 @@ class Dashboard {
     }
 
     applyLayout() {
-        const { weatherCities, clockCities } = this.config;
-        const hasMiddleContent = weatherCities.length > 0 || clockCities.length > 0;
-
-        // If no cities configured, use 2-column layout
-        if (!hasMiddleContent) {
-            document.querySelector('.dashboard').classList.add('two-columns');
-            document.querySelector('.column-center')?.remove();
-        }
-
-        // Hide weather cities section if empty
-        if (weatherCities.length === 0) {
-            document.querySelector('.weather-cities')?.remove();
-        }
-
-        // Hide world clocks section if empty
-        if (clockCities.length === 0) {
-            document.getElementById('world-clocks')?.remove();
-        }
+        // Center column is always shown with the new 3-row layout
+        // No dynamic layout adjustments needed
     }
 
     async initComponents() {
@@ -83,8 +69,13 @@ class Dashboard {
             ...config.location,
         });
 
-        // Weather cities (dynamic)
-        await this.initWeatherCities(config.weatherCities, config.location.units);
+        // City cards (Austin and Bogotá)
+        await this.initCityCards(config);
+
+        // Jellyfin Now Playing (if enabled)
+        if (config.jellyfin?.enabled) {
+            await this.initComponent('jellyfin-now-playing', JellyfinNowPlaying, {});
+        }
 
         // Docker containers
         await this.initComponent('docker-containers', DockerContainers, {
@@ -107,36 +98,45 @@ class Dashboard {
             glancesUrl: config.glances.url,
             updateInterval: config.glances.updateInterval,
         });
-
-        // World clocks (dynamic)
-        if (config.clockCities.length > 0) {
-            await this.initComponent('world-clocks', WorldClocks, {
-                cities: config.clockCities,
-            });
-        }
     }
 
-    async initWeatherCities(cities, units) {
-        const container = document.querySelector('.weather-cities');
-        if (!container || cities.length === 0) return;
+    async initCityCards(config) {
+        // Austin city card
+        const austinCity = config.weatherCities.find(c => c.name.toLowerCase().includes('austin'));
+        const austinClock = config.clockCities.find(c => c.name.toLowerCase().includes('austin'));
 
-        // Clear existing placeholder divs
-        container.innerHTML = '';
+        if (austinCity && austinClock) {
+            const austinCard = document.getElementById('city-card-austin');
+            if (austinCard) {
+                const instance = new CityCard(austinCard, {
+                    city: austinCity.name,
+                    lat: austinCity.lat,
+                    lon: austinCity.lon,
+                    timezone: austinClock.timezone,
+                    units: config.location.units || 'metric',
+                });
+                await instance.init();
+                this.components.push(instance);
+            }
+        }
 
-        // Create weather cards for each city
-        for (const city of cities) {
-            const div = document.createElement('div');
-            div.className = 'weather-card-mini';
-            container.appendChild(div);
+        // Bogotá city card
+        const bogotaCity = config.weatherCities.find(c => c.name.toLowerCase().includes('bogot'));
+        const bogotaClock = config.clockCities.find(c => c.name.toLowerCase().includes('bogot'));
 
-            const instance = new WeatherMini(div, {
-                city: city.name,
-                lat: city.lat,
-                lon: city.lon,
-                units: units || 'metric',
-            });
-            await instance.init();
-            this.components.push(instance);
+        if (bogotaCity && bogotaClock) {
+            const bogotaCard = document.getElementById('city-card-bogota');
+            if (bogotaCard) {
+                const instance = new CityCard(bogotaCard, {
+                    city: bogotaCity.name,
+                    lat: bogotaCity.lat,
+                    lon: bogotaCity.lon,
+                    timezone: bogotaClock.timezone,
+                    units: config.location.units || 'metric',
+                });
+                await instance.init();
+                this.components.push(instance);
+            }
         }
     }
 

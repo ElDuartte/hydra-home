@@ -24,9 +24,8 @@ export class SystemStats extends BaseComponent {
 
     async update() {
         // Initial load - fetch all data immediately
-        const [cpu, percpu, mem, fs, sensors, gpu, network] = await Promise.all([
+        const [cpu, mem, fs, sensors, gpu, network] = await Promise.all([
             this.glances.getCpu(),
-            this.glances.getPerCpu(),
             this.glances.getMem(),
             this.glances.getFs(),
             this.glances.getSensors(),
@@ -35,7 +34,6 @@ export class SystemStats extends BaseComponent {
         ]);
 
         if (cpu) this.updateCpu(cpu);
-        if (percpu) this.updateCpuCores(percpu);
         if (mem) this.updateRam(mem);
         if (fs) this.updateDisks(fs);
         if (sensors) this.updateTemps(sensors);
@@ -45,14 +43,10 @@ export class SystemStats extends BaseComponent {
 
     startUpdates() {
         // Different update intervals for each metric
-        // CPU & CPU cores: every 2 seconds (smooth updates)
+        // CPU: every 2 seconds (smooth updates)
         this.intervals.push(setInterval(async () => {
-            const [cpu, percpu] = await Promise.all([
-                this.glances.getCpu(),
-                this.glances.getPerCpu(),
-            ]);
+            const cpu = await this.glances.getCpu();
             if (cpu) this.updateCpu(cpu);
-            if (percpu) this.updateCpuCores(percpu);
         }, 2000));
 
         // RAM: every 1 second
@@ -98,7 +92,6 @@ export class SystemStats extends BaseComponent {
                 </div>
                 <div class="stat-bar"><div class="stat-bar-fill cpu" data-cpu-bar></div></div>
                 <div class="stat-details" data-cpu-details></div>
-                <div class="cpu-cores" data-cpu-cores></div>
             </div>
 
             <div class="stat-card" id="ram-card">
@@ -142,26 +135,6 @@ export class SystemStats extends BaseComponent {
         `);
     }
 
-    async update() {
-        const [cpu, percpu, mem, fs, sensors, gpu, network] = await Promise.all([
-            this.glances.getCpu(),
-            this.glances.getPerCpu(),
-            this.glances.getMem(),
-            this.glances.getFs(),
-            this.glances.getSensors(),
-            this.glances.getGpu(),
-            this.glances.getNetwork(),
-        ]);
-
-        if (cpu) this.updateCpu(cpu);
-        if (percpu) this.updateCpuCores(percpu);
-        if (mem) this.updateRam(mem);
-        if (fs) this.updateDisks(fs);
-        if (sensors) this.updateTemps(sensors);
-        if (gpu?.length > 0) this.updateGpu(gpu);
-        if (network) this.updateNetwork(network);
-    }
-
     updateCpu(data) {
         const percent = Math.round(data.total || 0);
         this.$('[data-cpu-value]').textContent = `${percent}%`;
@@ -173,29 +146,6 @@ export class SystemStats extends BaseComponent {
         if (data.system) details.push(`Sys: ${data.system.toFixed(1)}%`);
         if (data.cpucore) details.push(`${data.cpucore} cores`);
         this.$('[data-cpu-details]').textContent = details.join(' | ');
-    }
-
-    updateCpuCores(data) {
-        if (!data || !Array.isArray(data)) return;
-
-        const html = data.map(core => {
-            // Calculate usage from idle percentage, with safety checks
-            let percent = 0;
-            if (core.idle !== undefined && core.idle !== null) {
-                percent = Math.max(0, Math.min(100, Math.round(100 - core.idle)));
-            } else if (core.total !== undefined) {
-                percent = Math.max(0, Math.min(100, Math.round(core.total)));
-            }
-
-            const num = (core.cpu_number ?? 0) + 1;
-            return `
-                <div class="cpu-core" title="Core ${num}: ${percent}%">
-                    <div class="cpu-core-bar ${percent > 80 ? 'high' : ''}" style="height:${percent}%"></div>
-                    <span class="cpu-core-num">${num}</span>
-                </div>
-            `;
-        }).join('');
-        this.$('[data-cpu-cores]').innerHTML = html;
     }
 
     updateRam(data) {
