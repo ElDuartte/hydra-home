@@ -47,7 +47,7 @@ function getConfig() {
 
     return {
         glances: {
-            url: process.env.GLANCES_URL || 'http://localhost:61208/api/4',
+            url: '/api/glances',  // Use server proxy to avoid CORS
             updateInterval: parseInt(process.env.GLANCES_UPDATE_INTERVAL) || 3000,
         },
         location: vars.mainLocation,
@@ -61,6 +61,21 @@ function getConfig() {
 // API: Dashboard config
 app.get('/api/config', (req, res) => {
     res.json(getConfig());
+});
+
+// API: Glances proxy (avoids CORS issues)
+app.get('/api/glances/:endpoint', async (req, res) => {
+    try {
+        const glancesUrl = process.env.GLANCES_URL || 'http://localhost:61208/api/4';
+        const baseUrl = glancesUrl.replace(/\/api\/\d+\/?$/, '');
+        const url = `${baseUrl}/api/4/${req.params.endpoint}`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 // API: Weather proxy (hides API key)
