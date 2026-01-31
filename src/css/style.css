@@ -1040,10 +1040,16 @@ body {
 
     .column {
         max-height: none;
+        order: 3;
+    }
+
+    .column-center {
+        order: 1;
     }
 
     .column-right {
         grid-column: span 1;
+        order: 2;
     }
 
     .system-stats {
