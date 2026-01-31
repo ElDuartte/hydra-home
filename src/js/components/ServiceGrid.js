@@ -1,5 +1,5 @@
 /**
- * ServiceGrid Component - Grid de enlaces a servicios
+ * ServiceGrid Component - Grid of service links
  */
 
 export class ServiceGrid {
@@ -9,21 +9,21 @@ export class ServiceGrid {
     }
 
     /**
-     * Inicializa el componente
+     * Initialize the component
      */
     init() {
         this.render();
     }
 
     /**
-     * Renderiza el grid de servicios
+     * Render the service grid
      */
     render() {
         if (this.services.length === 0) {
             this.container.innerHTML = `
                 <div style="text-align: center; color: var(--text-muted); padding: 2rem;">
-                    No hay servicios configurados.<br>
-                    <span style="font-size: 0.875rem;">Edita config.js para añadir servicios.</span>
+                    No services configured.<br>
+                    <span style="font-size: 0.875rem;">Edit config.js to add services.</span>
                 </div>
             `;
             return;
@@ -35,14 +35,14 @@ export class ServiceGrid {
 
         this.container.innerHTML = servicesHTML;
 
-        // Añadir event listeners para animaciones
+        // Add event listeners for animations
         this.addInteractivity();
     }
 
     /**
-     * Crea el HTML de una tarjeta de servicio
-     * @param {Object} service - Datos del servicio
-     * @returns {string} - HTML de la tarjeta
+     * Create the HTML for a service card
+     * @param {Object} service - Service data
+     * @returns {string} - Card HTML
      */
     createServiceCard(service) {
         const { name, url, icon, category } = service;
@@ -61,9 +61,9 @@ export class ServiceGrid {
     }
 
     /**
-     * Escapa caracteres HTML para prevenir XSS
-     * @param {string} text - Texto a escapar
-     * @returns {string} - Texto escapado
+     * Escape HTML characters to prevent XSS
+     * @param {string} text - Text to escape
+     * @returns {string} - Escaped text
      */
     escapeHtml(text) {
         const div = document.createElement('div');
@@ -72,18 +72,18 @@ export class ServiceGrid {
     }
 
     /**
-     * Añade interactividad a las tarjetas
+     * Add interactivity to cards
      */
     addInteractivity() {
         const cards = this.container.querySelectorAll('.service-card');
 
         cards.forEach(card => {
-            // Efecto de ripple al hacer click
+            // Ripple effect on click
             card.addEventListener('click', e => {
                 this.createRipple(e, card);
             });
 
-            // Efecto de tilt en hover (opcional)
+            // Tilt effect on hover (optional)
             card.addEventListener('mousemove', e => {
                 this.handleTilt(e, card);
             });
@@ -95,9 +95,9 @@ export class ServiceGrid {
     }
 
     /**
-     * Crea efecto ripple
-     * @param {Event} e - Evento click
-     * @param {HTMLElement} card - Elemento tarjeta
+     * Create ripple effect
+     * @param {Event} e - Click event
+     * @param {HTMLElement} card - Card element
      */
     createRipple(e, card) {
         const ripple = document.createElement('span');
@@ -120,7 +120,7 @@ export class ServiceGrid {
             pointer-events: none;
         `;
 
-        // Añadir keyframes si no existen
+        // Add keyframes if they don't exist
         if (!document.querySelector('#ripple-styles')) {
             const style = document.createElement('style');
             style.id = 'ripple-styles';
@@ -143,9 +143,9 @@ export class ServiceGrid {
     }
 
     /**
-     * Maneja efecto tilt en hover
-     * @param {Event} e - Evento mousemove
-     * @param {HTMLElement} card - Elemento tarjeta
+     * Handle tilt effect on hover
+     * @param {Event} e - Mousemove event
+     * @param {HTMLElement} card - Card element
      */
     handleTilt(e, card) {
         const rect = card.getBoundingClientRect();
@@ -162,8 +162,8 @@ export class ServiceGrid {
     }
 
     /**
-     * Filtra servicios por categoría
-     * @param {string} category - Categoría a filtrar (null = todas)
+     * Filter services by category
+     * @param {string} category - Category to filter (null = all)
      */
     filterByCategory(category) {
         const cards = this.container.querySelectorAll('.service-card');
@@ -178,7 +178,7 @@ export class ServiceGrid {
     }
 
     /**
-     * Limpia el componente
+     * Clean up the component
      */
     destroy() {
         this.container.innerHTML = '';

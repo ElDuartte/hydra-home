@@ -1,5 +1,5 @@
 /**
- * Glances API Module - Cliente para la API de Glances
+ * Glances API Module - Client for the Glances API
  */
 
 export class GlancesAPI {
@@ -8,7 +8,7 @@ export class GlancesAPI {
     }
 
     /**
-     * Fetch genérico con manejo de errores
+     * Generic fetch with error handling
      */
     async fetch(endpoint) {
         try {
@@ -24,98 +24,98 @@ export class GlancesAPI {
     }
 
     /**
-     * Obtiene todos los datos de una vez
+     * Get all data at once
      */
     async getAll() {
         return await this.fetch('/all');
     }
 
     /**
-     * CPU - Porcentaje de uso
+     * CPU - Usage percentage
      */
     async getCpu() {
         return await this.fetch('/cpu');
     }
 
     /**
-     * CPU - Uso por core
+     * CPU - Usage per core
      */
     async getPerCpu() {
         return await this.fetch('/percpu');
     }
 
     /**
-     * Quicklook - Resumen rápido (CPU, MEM, SWAP)
+     * Quicklook - Quick summary (CPU, MEM, SWAP)
      */
     async getQuicklook() {
         return await this.fetch('/quicklook');
     }
 
     /**
-     * Memoria RAM
+     * RAM Memory
      */
     async getMem() {
         return await this.fetch('/mem');
     }
 
     /**
-     * Memoria Swap
+     * Swap Memory
      */
     async getSwap() {
         return await this.fetch('/memswap');
     }
 
     /**
-     * Sistemas de archivos (discos)
+     * File systems (disks)
      */
     async getFs() {
         return await this.fetch('/fs');
     }
 
     /**
-     * Sensores de temperatura
+     * Temperature sensors
      */
     async getSensors() {
         return await this.fetch('/sensors');
     }
 
     /**
-     * Contenedores Docker
+     * Docker containers
      */
     async getDocker() {
         return await this.fetch('/containers');
     }
 
     /**
-     * GPU (si está disponible)
+     * GPU (if available)
      */
     async getGpu() {
         return await this.fetch('/gpu');
     }
 
     /**
-     * Información de red
+     * Network information
      */
     async getNetwork() {
         return await this.fetch('/network');
     }
 
     /**
-     * Información del sistema (hostname, OS, etc)
+     * System information (hostname, OS, etc)
      */
     async getSystem() {
         return await this.fetch('/system');
     }
 
     /**
-     * Uptime del sistema
+     * System uptime
      */
     async getUptime() {
         return await this.fetch('/uptime');
     }
 
     /**
-     * Carga del sistema (load average)
+     * System load (load average)
      */
     async getLoad() {
         return await this.fetch('/load');

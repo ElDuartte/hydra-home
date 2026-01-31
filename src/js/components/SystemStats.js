@@ -146,32 +146,9 @@ export class SystemStats extends BaseComponent {
         const html = data
             .filter(d => {
                 const mount = d.mnt_point || d.mountpoint || '';
-                const device = d.device_name || '';
 
-                // Filter out system/virtual mounts and Docker bind mounts
-                // Only show actual directory mounts (not individual files)
-                const isFileBind = mount.includes('/etc/') ||
-                                   mount.includes('/usr/') ||
-                                   mount.startsWith('/etc/') ||
-                                   mount.startsWith('/usr/lib/') ||
-                                   mount.match(/\.(conf|json|yml|yaml|xml|sock)$/);
-
-                const isSystemMount = mount.startsWith('/boot') ||
-                                     mount.includes('/snap/') ||
-                                     mount.startsWith('/mnt/wsl') ||
-                                     mount.startsWith('/mnt/wslg') ||
-                                     mount.includes('/docker/') ||
-                                     mount.startsWith('/run/') ||
-                                     mount.startsWith('/dev/') ||
-                                     mount.startsWith('/sys/') ||
-                                     mount === '/init';
-
-                // Only show main filesystem mounts
-                const isValidMount = mount === '/' ||
-                                    mount === '/home' ||
-                                    (mount.startsWith('/mnt/') && !mount.startsWith('/mnt/wsl'));
-
-                return !isFileBind && !isSystemMount && isValidMount;
+                // Only show root filesystem - represents the entire main drive
+                return mount === '/';
             })
             .map(d => {
                 const mount = d.mnt_point || d.mountpoint || 'Unknown';
