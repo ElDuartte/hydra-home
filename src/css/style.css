@@ -86,7 +86,7 @@ body {
 .column-center {
     overflow: hidden;
     display: grid;
-    grid-template-rows: 275px 130px auto;
+    grid-template-rows: 200px 85px min-content;
     gap: 10px;
 }
 
@@ -121,6 +121,7 @@ body {
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
     padding: 12px;
+    height: 200px;
 }
 
 /* Center Column Row 2: Austin + Bogotá */
@@ -128,7 +129,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    height: 50px;
+    height: 85px;
 }
 
 .city-card {
@@ -227,6 +228,7 @@ body {
     padding: 8px;
     display: flex;
     flex-direction: column;
+    height: auto;
 }
 
 .jellyfin-now-playing {
@@ -399,7 +401,7 @@ body {
 }
 
 .main-weather .weather-details {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 4px;
     margin-top: 6px;
     padding-top: 6px;
