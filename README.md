@@ -1,3 +1,6 @@
+WIP
+<img width="1917" height="919" alt="image" src="https://github.com/user-attachments/assets/bc78499e-8577-4067-9316-d630b0bbf60d" />
+
 # Hydra Dashboard
 
 A modern, real-time system monitoring dashboard with weather, clocks, and Docker container management.
