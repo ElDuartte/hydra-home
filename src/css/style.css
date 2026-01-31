@@ -84,7 +84,6 @@ body {
 }
 
 .column-center {
-    justify-content: space-between;
     overflow: hidden;
 }
 
@@ -1113,29 +1112,31 @@ body {
     text-align: right;
 }
 
-.jellyfin-info {
+.jellyfin-info-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.jellyfin-info-card {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    margin-top: var(--spacing-sm);
     padding: var(--spacing-sm);
     background: var(--bg-secondary);
     border-radius: 8px;
     font-size: 0.75rem;
 }
 
-.jellyfin-info-item {
-    display: flex;
-    justify-content: space-between;
-}
-
 .info-label {
     color: var(--text-muted);
+    font-size: 0.7rem;
 }
 
 .info-value {
     color: var(--text-secondary);
     font-weight: 500;
+    font-size: 0.875rem;
 }
 
 .jellyfin-error {

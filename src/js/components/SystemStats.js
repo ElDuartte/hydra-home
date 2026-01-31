@@ -45,7 +45,7 @@ export class SystemStats extends BaseComponent {
 
     startUpdates() {
         // Different update intervals for each metric
-        // CPU & CPU cores: every 1 second
+        // CPU & CPU cores: every 3 seconds (original)
         this.intervals.push(setInterval(async () => {
             const [cpu, percpu] = await Promise.all([
                 this.glances.getCpu(),
@@ -53,7 +53,7 @@ export class SystemStats extends BaseComponent {
             ]);
             if (cpu) this.updateCpu(cpu);
             if (percpu) this.updateCpuCores(percpu);
-        }, 1000));
+        }, 3000));
 
         // RAM: every 1 second
         this.intervals.push(setInterval(async () => {

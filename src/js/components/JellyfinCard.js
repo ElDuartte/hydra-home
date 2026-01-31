@@ -194,16 +194,16 @@ export class JellyfinCard extends BaseComponent {
 
             ${nowPlayingHtml}
 
-            <div class="jellyfin-info">
-                <div class="jellyfin-info-item">
+            <div class="jellyfin-info-cards">
+                <div class="jellyfin-info-card">
                     <span class="info-label">Server:</span>
                     <span class="info-value">${this.escape(serverName)}</span>
                 </div>
-                <div class="jellyfin-info-item">
+                <div class="jellyfin-info-card">
                     <span class="info-label">Version:</span>
                     <span class="info-value">${this.escape(version)}</span>
                 </div>
-                <div class="jellyfin-info-item">
+                <div class="jellyfin-info-card">
                     <span class="info-label">Episodes:</span>
                     <span class="info-value">${episodeCount.toLocaleString()}</span>
                 </div>
