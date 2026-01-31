@@ -552,7 +552,7 @@ body {
 .system-stats {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: 10px;
 }
 
 .stat-card {
@@ -677,7 +677,7 @@ body {
 .disk-list {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: 10px;
 }
 
 .disk-item {
@@ -710,7 +710,7 @@ body {
 .temp-list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-xs);
+    gap: 10px;
 }
 
 .temp-item {
@@ -816,7 +816,7 @@ body {
     .system-stats {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: var(--spacing-sm);
+        gap: 10px;
     }
 }
 
@@ -836,6 +836,7 @@ body {
 
     .system-stats {
         grid-template-columns: 1fr;
+        gap: 10px;
     }
 
     .clock-time {
@@ -1013,7 +1014,7 @@ body {
 .jellyfin-stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--spacing-sm);
+    gap: 10px;
 }
 
 .jellyfin-stat {
