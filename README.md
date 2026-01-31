@@ -307,9 +307,9 @@ The dashboard server exposes these endpoints:
 
 ## License
 
-MIT
+I'm 007 I have license To kill 🔫😎
 
-## Credits
+## Stuff used
 
 - Built with [Glances](https://github.com/nicolargo/glances) for system monitoring
 - Weather data from [OpenWeatherMap](https://openweathermap.org/)
