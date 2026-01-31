@@ -1,0 +1,34 @@
+{
+  "mainLocation": {
+    "city": "Madrid",
+    "country": "ES",
+    "lat": 40.4168,
+    "lon": -3.7038,
+    "units": "metric"
+  },
+
+  "weatherCities": [
+    { "name": "Bogotá", "lat": 4.6097, "lon": -74.0817 },
+    { "name": "Austin", "lat": 30.2672, "lon": -97.7431 }
+  ],
+
+  "clockCities": [
+    { "name": "London", "timezone": "Europe/London" },
+    { "name": "New York", "timezone": "America/New_York" },
+    { "name": "Bogotá", "timezone": "America/Bogota" },
+    { "name": "Austin", "timezone": "America/Chicago" }
+  ],
+
+  "clock": {
+    "use24Hour": true,
+    "showSeconds": true,
+    "locale": "es-ES"
+  },
+
+  "theme": {
+    "--bg-primary": "",
+    "--bg-card": "",
+    "--accent-blue": "",
+    "--accent-purple": ""
+  }
+}

@@ -1,0 +1,902 @@
+/* ========================================
+   CSS Variables - Tokyo Night Theme
+   ======================================== */
+:root {
+    /* Background colors */
+    --bg-primary: #1a1b26;
+    --bg-secondary: #16161e;
+    --bg-tertiary: #24283b;
+    --bg-card: #1f2335;
+
+    /* Text colors */
+    --text-primary: #c0caf5;
+    --text-secondary: #a9b1d6;
+    --text-muted: #565f89;
+
+    /* Accent colors */
+    --accent-blue: #7aa2f7;
+    --accent-purple: #bb9af7;
+    --accent-cyan: #7dcfff;
+    --accent-green: #9ece6a;
+    --accent-orange: #ff9e64;
+    --accent-red: #f7768e;
+    --accent-yellow: #e0af68;
+
+    /* Border and shadows */
+    --border-color: #292e42;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+
+    /* Sizing */
+    --border-radius: 12px;
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+}
+
+/* ========================================
+   Reset & Base Styles
+   ======================================== */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+    line-height: 1.6;
+}
+
+/* ========================================
+   Dashboard Layout - CSS Grid 3 Columns
+   ======================================== */
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1.2fr;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    height: 100vh;
+    max-width: 1920px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+/* 2-column layout when no middle content */
+.dashboard.two-columns {
+    grid-template-columns: 1fr 1.5fr;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    height: 100%;
+    overflow-y: auto;
+}
+
+.column-center {
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.column::-webkit-scrollbar {
+    width: 6px;
+}
+
+.column::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    background: var(--bg-primary);
+    z-index: 10;
+}
+
+/* ========================================
+   Card Base Style
+   ======================================== */
+.card {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px var(--shadow-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px var(--shadow-color);
+}
+
+/* ========================================
+   Clock Component
+   ======================================== */
+.clock-container {
+    text-align: center;
+    padding: var(--spacing-lg);
+}
+
+.clock-time {
+    font-size: 4.5rem;
+    font-weight: 200;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.clock-seconds {
+    font-size: 1.75rem;
+    color: var(--accent-blue);
+    vertical-align: super;
+    margin-left: 0.25rem;
+}
+
+.clock-date {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin-top: var(--spacing-sm);
+}
+
+.clock-greeting {
+    font-size: 1.25rem;
+    color: var(--accent-purple);
+    margin-top: var(--spacing-md);
+    font-weight: 300;
+}
+
+/* ========================================
+   Weather Component
+   ======================================== */
+.weather-container {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+}
+
+.weather-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+}
+
+.weather-icon {
+    font-size: 3.5rem;
+}
+
+.weather-temp {
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: var(--text-primary);
+}
+
+.weather-temp-unit {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    vertical-align: super;
+}
+
+.weather-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
+}
+
+.weather-detail {
+    text-align: center;
+}
+
+.weather-detail-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.weather-detail-value {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.weather-location {
+    text-align: center;
+    margin-top: var(--spacing-sm);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.weather-error {
+    text-align: center;
+    padding: var(--spacing-md);
+    color: var(--accent-red);
+}
+
+.weather-error-icon {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+/* ========================================
+   Weather Mini Cards (ciudades secundarias)
+   ======================================== */
+.weather-cities {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+}
+
+.weather-card-mini {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.weather-card-mini:hover {
+    border-color: var(--accent-blue);
+}
+
+.weather-mini-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+}
+
+.weather-mini-city {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.weather-mini-icon {
+    font-size: 1.5rem;
+}
+
+.weather-mini-temp {
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.weather-mini-unit {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    vertical-align: super;
+}
+
+.weather-mini-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: capitalize;
+    margin-top: 4px;
+}
+
+.weather-mini-details {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+    padding-top: var(--spacing-xs);
+    border-top: 1px solid var(--border-color);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.weather-mini-loading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm);
+}
+
+.loading-dots {
+    color: var(--text-muted);
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+
+.weather-mini-error {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.weather-mini-error-icon {
+    font-size: 1.25rem;
+}
+
+/* ========================================
+   Service Grid Component (unused)
+   ======================================== */
+#service-grid-wrapper {
+    margin-top: var(--spacing-md);
+}
+
+.service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--spacing-sm);
+}
+
+.service-card {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm);
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.service-card:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--accent-blue);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px var(--shadow-color);
+}
+
+.service-icon {
+    font-size: 1.75rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+.service-name {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.service-card:hover .service-name {
+    color: var(--text-primary);
+}
+
+/* ========================================
+   Docker Containers Component
+   ======================================== */
+.docker-containers {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.containers-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--spacing-xs);
+}
+
+.containers-count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.containers-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.container-card {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.container-card:hover {
+    border-color: var(--accent-blue);
+}
+
+.container-card.running {
+    border-left: 3px solid var(--accent-green);
+}
+
+.container-card.stopped {
+    border-left: 3px solid var(--accent-red);
+    opacity: 0.7;
+}
+
+.container-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.container-status {
+    font-size: 0.6rem;
+}
+
+.container-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.container-image {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+    margin-left: 1.1rem;
+}
+
+.container-stats {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-xs);
+    padding-top: var(--spacing-xs);
+    border-top: 1px solid var(--border-color);
+}
+
+.container-stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+.container-stat .stat-icon {
+    font-size: 0.65rem;
+}
+
+.container-stopped-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: var(--spacing-xs);
+    margin-left: 1.1rem;
+}
+
+.no-containers {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-lg);
+    color: var(--text-muted);
+}
+
+.no-containers-icon {
+    font-size: 2rem;
+}
+
+.docker-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    color: var(--accent-red);
+}
+
+.retry-btn {
+    padding: 0.5rem 1rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.retry-btn:hover {
+    border-color: var(--accent-blue);
+    color: var(--text-primary);
+}
+
+/* ========================================
+   System Stats Component
+   ======================================== */
+.system-stats {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+}
+
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.stat-label-icon {
+    font-size: 0.9rem;
+}
+
+.stat-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.stat-details {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: var(--spacing-xs);
+}
+
+.stat-bar {
+    height: 6px;
+    background: var(--bg-secondary);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.stat-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.stat-bar-fill.cpu {
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+}
+
+/* CPU Cores visualization */
+.cpu-cores {
+    display: flex;
+    gap: 4px;
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-xs);
+    border-top: 1px solid var(--border-color);
+    height: 50px;
+    align-items: flex-end;
+}
+
+.cpu-core {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    position: relative;
+}
+
+.cpu-core-bar {
+    width: 100%;
+    background: linear-gradient(180deg, var(--accent-cyan), var(--accent-blue));
+    border-radius: 2px 2px 0 0;
+    transition: height 0.3s ease;
+    min-height: 2px;
+}
+
+.cpu-core-bar.high {
+    background: linear-gradient(180deg, var(--accent-red), var(--accent-orange));
+}
+
+.cpu-core-num {
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.stat-bar-fill.ram {
+    background: linear-gradient(90deg, var(--accent-purple), var(--accent-orange));
+}
+
+.stat-bar-fill.disk {
+    background: linear-gradient(90deg, var(--accent-green), var(--accent-yellow));
+}
+
+.stat-bar-fill.gpu {
+    background: linear-gradient(90deg, var(--accent-orange), var(--accent-red));
+}
+
+.stat-bar-fill.network {
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+}
+
+/* Warning states */
+.stat-bar-fill.warning {
+    background: linear-gradient(90deg, var(--accent-orange), var(--accent-red));
+}
+
+/* Disk list */
+.disk-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.disk-item {
+    padding-top: var(--spacing-xs);
+}
+
+.disk-item:not(:first-child) {
+    border-top: 1px solid var(--border-color);
+}
+
+.disk-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.disk-mount {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-family: monospace;
+}
+
+.disk-usage {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* Temperature list */
+.temp-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-xs);
+}
+
+.temp-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.temp-item.warning {
+    background: rgba(255, 158, 100, 0.1);
+}
+
+.temp-item.critical {
+    background: rgba(247, 118, 142, 0.1);
+}
+
+.temp-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.temp-value {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.temp-item.warning .temp-value {
+    color: var(--accent-orange);
+}
+
+.temp-item.critical .temp-value {
+    color: var(--accent-red);
+}
+
+/* Network list */
+.network-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.network-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.network-item:not(:last-child) {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--spacing-xs);
+}
+
+.network-name {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-family: monospace;
+}
+
+.network-speeds {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.network-rx, .network-tx {
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.network-rx {
+    color: var(--accent-green);
+}
+
+.network-tx {
+    color: var(--accent-orange);
+}
+
+/* No data state */
+.no-data {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: var(--spacing-xs);
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+@media (max-width: 1400px) {
+    .dashboard {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .column-right {
+        grid-column: span 2;
+    }
+
+    .system-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+        padding: var(--spacing-sm);
+    }
+
+    .column {
+        max-height: none;
+    }
+
+    .column-right {
+        grid-column: span 1;
+    }
+
+    .system-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .clock-time {
+        font-size: 3rem;
+    }
+
+    .clock-seconds {
+        font-size: 1.25rem;
+    }
+}
+
+/* ========================================
+   Loading States
+   ======================================== */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.loading::after {
+    content: '';
+    width: 16px;
+    height: 16px;
+    margin-left: var(--spacing-sm);
+    border: 2px solid var(--border-color);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   Scrollbar Styling
+   ======================================== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* ========================================
+   World Clocks Component
+   ======================================== */
+.world-clocks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--spacing-sm);
+    margin-top: auto;
+}
+
+.world-clock-item {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.world-clock-city {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.world-clock-time {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.world-clock-offset {
+    font-size: 0.7rem;
+    color: var(--accent-cyan);
+    margin-top: 2px;
+}

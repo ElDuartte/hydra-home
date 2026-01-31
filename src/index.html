@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydra Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Left Column: Docker Containers -->
+        <aside class="column column-left">
+            <h2 class="section-title">🐳 Docker</h2>
+            <div id="docker-containers" class="docker-containers"></div>
+        </aside>
+
+        <!-- Center Column: Clock, Weather, World Clocks -->
+        <main class="column column-center">
+            <div>
+                <div id="clock" class="clock-container"></div>
+                <div id="weather" class="weather-container"></div>
+                <div class="weather-cities"></div>
+            </div>
+            <div id="world-clocks" class="world-clocks"></div>
+        </main>
+
+        <!-- Right Column: System Stats -->
+        <aside class="column column-right">
+            <h2 class="section-title">📊 Sistema</h2>
+            <div id="system-stats" class="system-stats"></div>
+        </aside>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

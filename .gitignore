@@ -1,0 +1,12 @@
+# Environment variables (contiene API keys)
+.env
+
+# Config generado automáticamente desde template
+src/js/config.js
+
+# Node (si alguien lo usa para desarrollo)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
