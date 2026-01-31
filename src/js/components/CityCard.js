@@ -18,6 +18,7 @@ export class CityCard extends BaseComponent {
     }
 
     async init() {
+        this.intervals = [];
         this.timeElement = null;
         this.weatherElement = null;
         await this.update();
@@ -98,5 +99,10 @@ export class CityCard extends BaseComponent {
 
         // Update time every second
         this.intervals.push(setInterval(() => this.updateTime(), 1000));
+    }
+
+    destroy() {
+        this.intervals.forEach(interval => clearInterval(interval));
+        this.intervals = [];
     }
 }
