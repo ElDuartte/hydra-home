@@ -53,15 +53,14 @@ export class JellyfinCard extends BaseComponent {
 
     async update() {
         try {
-            const [systemInfo, sessions, itemCounts, containerData] = await Promise.all([
+            const [systemInfo, itemCounts, containerData] = await Promise.all([
                 this.fetchJellyfin('/System/Info'),
-                this.fetchJellyfin('/Sessions'),
                 this.fetchJellyfin('/Items/Counts'),
                 this.fetchContainerStats(),
             ]);
 
             this.updateStatus(true);
-            this.renderContent({ systemInfo, sessions, itemCounts, containerData });
+            this.renderContent({ systemInfo, itemCounts, containerData });
         } catch (error) {
             console.error('Jellyfin API error:', error);
             this.updateStatus(false);
@@ -114,10 +113,7 @@ export class JellyfinCard extends BaseComponent {
         }
     }
 
-    renderContent({ systemInfo, sessions, itemCounts, containerData }) {
-        const activeSessions = sessions.filter(s => s.NowPlayingItem);
-        const activeStreams = activeSessions.length;
-
+    renderContent({ systemInfo, itemCounts, containerData }) {
         // System info
         const serverName = systemInfo.ServerName || 'Jellyfin';
         const version = systemInfo.Version || 'Unknown';
@@ -172,16 +168,6 @@ export class JellyfinCard extends BaseComponent {
             `;
         }
 
-        let nowPlayingHtml = '';
-        if (activeStreams > 0) {
-            nowPlayingHtml = `
-                <div class="jellyfin-section">
-                    <div class="jellyfin-section-title">🎬 Now Playing (${activeStreams})</div>
-                    ${activeSessions.map(s => this.renderSession(s)).join('')}
-                </div>
-            `;
-        }
-
         const content = `
             ${containerStatsHtml}
 
@@ -191,8 +177,6 @@ export class JellyfinCard extends BaseComponent {
                 <div class="jellyfin-stat">🎵 ${songCount.toLocaleString()}</div>
                 <div class="jellyfin-stat">💿 ${albumCount.toLocaleString()}</div>
             </div>
-
-            ${nowPlayingHtml}
 
             <div class="jellyfin-info-cards">
                 <div class="jellyfin-info-card">
@@ -211,49 +195,6 @@ export class JellyfinCard extends BaseComponent {
         `;
 
         this.$('.jellyfin-content').innerHTML = content;
-    }
-
-    renderSession(session) {
-        const item = session.NowPlayingItem;
-        const userName = session.UserName || 'Unknown';
-        const deviceName = session.DeviceName || 'Unknown Device';
-        const itemName = item.Name || 'Unknown';
-        const itemType = item.Type || '';
-
-        let progress = '';
-        if (item.RunTimeTicks && session.PlayState?.PositionTicks) {
-            const percent = Math.round((session.PlayState.PositionTicks / item.RunTimeTicks) * 100);
-            progress = `
-                <div class="playback-progress">
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${percent}%"></div>
-                    </div>
-                    <span class="progress-text">${percent}%</span>
-                </div>
-            `;
-        }
-
-        let metadata = '';
-        if (itemType === 'Episode') {
-            const series = item.SeriesName || '';
-            const season = item.ParentIndexNumber || 0;
-            const episode = item.IndexNumber || 0;
-            metadata = `<div class="session-metadata">${series} - S${season}E${episode}</div>`;
-        } else if (item.ProductionYear) {
-            metadata = `<div class="session-metadata">${item.ProductionYear}</div>`;
-        }
-
-        return `
-            <div class="jellyfin-session">
-                <div class="session-header">
-                    <span class="session-user">👤 ${this.escape(userName)}</span>
-                    <span class="session-device">📱 ${this.escape(deviceName)}</span>
-                </div>
-                <div class="session-title">${this.escape(itemName)}</div>
-                ${metadata}
-                ${progress}
-            </div>
-        `;
     }
 
     renderError(message) {

@@ -44,15 +44,15 @@ export class JellyfinNowPlaying extends BaseComponent {
     renderSessions(sessions) {
         const activeSessions = sessions.filter(s => s.NowPlayingItem);
 
+        // Hide the entire row if nothing is playing
+        const row3 = document.querySelector('.center-row-3');
         if (activeSessions.length === 0) {
-            this.html(`
-                <div class="now-playing-empty">
-                    <span class="empty-icon">🎬</span>
-                    <span class="empty-text">No active streams</span>
-                </div>
-            `);
+            if (row3) row3.style.display = 'none';
             return;
         }
+
+        // Show the row if there are active sessions
+        if (row3) row3.style.display = 'block';
 
         const html = `
             <div class="now-playing-header">

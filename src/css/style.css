@@ -133,30 +133,30 @@ body {
     background: var(--bg-card);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
-    padding: var(--spacing-md);
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .city-card-header {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--text-muted);
-    padding-bottom: var(--spacing-xs);
+    padding-bottom: 6px;
     border-bottom: 1px solid var(--border-color);
 }
 
 .city-card-content {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
 }
 
 .city-time {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 300;
     color: var(--text-primary);
     text-align: center;
@@ -166,36 +166,36 @@ body {
 .city-weather {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
 }
 
 .city-weather-main {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 8px;
 }
 
 .city-weather-icon {
-    font-size: 2.5rem;
+    font-size: 2rem;
 }
 
 .city-weather-temp {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 300;
     color: var(--text-primary);
 }
 
 .city-weather-desc {
     text-align: center;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     color: var(--text-secondary);
     text-transform: capitalize;
 }
 
 .city-weather-humidity {
     text-align: center;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: var(--text-muted);
 }
 
