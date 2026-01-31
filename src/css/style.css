@@ -86,7 +86,7 @@ body {
 .column-center {
     overflow: hidden;
     display: grid;
-    grid-template-rows: auto auto 1fr;
+    grid-template-rows: auto auto auto;
     gap: 10px;
 }
 
@@ -213,8 +213,9 @@ body {
     background: var(--bg-card);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
-    padding: var(--spacing-md);
+    padding: 12px;
     overflow-y: auto;
+    min-height: 0;
 }
 
 .jellyfin-now-playing {
@@ -1072,7 +1073,7 @@ body {
 .jellyfin-card {
     background: var(--bg-card);
     border-radius: var(--border-radius);
-    padding: var(--spacing-md);
+    padding: 12px;
     border: 1px solid var(--border-color);
 }
 
@@ -1080,8 +1081,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-md);
-    padding-bottom: var(--spacing-sm);
+    margin-bottom: 10px;
+    padding-bottom: 10px;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -1145,11 +1146,10 @@ body {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-    padding: var(--spacing-sm);
+    padding: 10px;
     background: var(--bg-secondary);
     border-radius: 8px;
     border-left: 3px solid #00a4dc;
-    margin-bottom: var(--spacing-xs);
 }
 
 .container-stat-item {
@@ -1292,21 +1292,22 @@ body {
 
 .jellyfin-info-card {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: var(--spacing-sm);
+    flex-direction: row;
+    gap: 6px;
+    padding: 10px;
     background: var(--bg-secondary);
     border-radius: 8px;
     font-size: 0.75rem;
+    align-items: center;
 }
 
 .info-label {
     color: var(--text-muted);
-    font-size: 0.7rem;
+    font-size: 0.75rem;
 }
 
 .info-value {
-    color: var(--text-secondary);
+    color: var(--text-primary);
     font-weight: 500;
     font-size: 0.875rem;
 }
