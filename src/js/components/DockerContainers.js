@@ -34,7 +34,13 @@ export class DockerContainers extends BaseComponent {
 
     renderContainers(data) {
         // Handle both API v3 (data.containers) and v4 (data is array) formats
-        const containers = Array.isArray(data) ? data : (data.containers || []);
+        let containers = Array.isArray(data) ? data : (data.containers || []);
+
+        // Filter out Jellyfin container (it has its own special card)
+        containers = containers.filter(c => {
+            const name = (c.name || '').toLowerCase();
+            return !name.includes('jellyfin');
+        });
 
         if (containers.length === 0) {
             this.html(`

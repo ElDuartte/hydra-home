@@ -19,7 +19,7 @@ function loadVariables() {
         clockCities: [],
         clock: { use24Hour: true, showSeconds: true, locale: 'es-ES' },
         theme: {},
-        jellyfin: { enabled: false, url: 'http://localhost:8096', apiKey: '' },
+        jellyfin: { enabled: false },
     };
 
     try {
@@ -56,7 +56,11 @@ function getConfig() {
         weatherCities: vars.weatherCities || [],
         clockCities: vars.clockCities || [],
         theme,
-        jellyfin: vars.jellyfin || { enabled: false, url: 'http://localhost:8096', apiKey: '' },
+        jellyfin: {
+            enabled: vars.jellyfin?.enabled || false,
+            url: process.env.JELLYFIN_URL || 'http://localhost:8096',
+            apiKey: process.env.JELLYFIN_API_KEY || '',
+        },
     };
 }
 
@@ -90,7 +94,7 @@ app.get('/api/weather', async (req, res) => {
             return res.status(500).json({ error: 'Missing WEATHER_API_KEY in .env' });
         }
 
-        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${units}&appid=${apiKey}&lang=es`;
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${units}&appid=${apiKey}&lang=en`;
         const response = await fetch(url);
         const data = await response.json();
 

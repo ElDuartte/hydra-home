@@ -965,6 +965,47 @@ body {
     color: var(--text-muted);
 }
 
+.jellyfin-container-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border-left: 3px solid #00a4dc;
+    margin-bottom: var(--spacing-xs);
+}
+
+.container-stat-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 6px;
+}
+
+.container-stat-item .stat-icon {
+    font-size: 1.25rem;
+}
+
+.container-stat-item .stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.container-stat-item .stat-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.container-stat-item .stat-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
 .jellyfin-stats {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

@@ -3,12 +3,15 @@
  */
 
 import { BaseComponent } from './BaseComponent.js';
+import { GlancesAPI } from '../glances.js';
+import { formatBytes } from '../api.js';
 
 export class JellyfinCard extends BaseComponent {
     defaults() {
         return {
             url: 'http://localhost:8096',
             apiKey: '',
+            glancesUrl: 'http://localhost:61208/api/3',
             updateInterval: 5000, // 5 seconds
         };
     }
@@ -16,6 +19,7 @@ export class JellyfinCard extends BaseComponent {
     async init() {
         this.jellyfinUrl = this.options.url;
         this.apiKey = this.options.apiKey;
+        this.glances = new GlancesAPI(this.options.glancesUrl);
         this.render();
         await this.update();
         this.startUpdates();
@@ -55,18 +59,37 @@ export class JellyfinCard extends BaseComponent {
 
     async update() {
         try {
-            const [systemInfo, sessions, itemCounts] = await Promise.all([
+            const [systemInfo, sessions, itemCounts, containerData] = await Promise.all([
                 this.fetchJellyfin('/System/Info'),
                 this.fetchJellyfin('/Sessions'),
                 this.fetchJellyfin('/Items/Counts'),
+                this.fetchContainerStats(),
             ]);
 
             this.updateStatus(true);
-            this.renderContent({ systemInfo, sessions, itemCounts });
+            this.renderContent({ systemInfo, sessions, itemCounts, containerData });
         } catch (error) {
             console.error('Jellyfin API error:', error);
             this.updateStatus(false);
             this.renderError(error.message);
+        }
+    }
+
+    async fetchContainerStats() {
+        try {
+            const containers = await this.glances.getDocker();
+            if (!containers) return null;
+
+            // Find Jellyfin container
+            const jellyfinContainer = containers.find(c => {
+                const name = (c.name || '').toLowerCase();
+                return name.includes('jellyfin');
+            });
+
+            return jellyfinContainer || null;
+        } catch (error) {
+            console.error('Failed to fetch container stats:', error);
+            return null;
         }
     }
 
@@ -97,7 +120,7 @@ export class JellyfinCard extends BaseComponent {
         }
     }
 
-    renderContent({ systemInfo, sessions, itemCounts }) {
+    renderContent({ systemInfo, sessions, itemCounts, containerData }) {
         const activeSessions = sessions.filter(s => s.NowPlayingItem);
         const activeStreams = activeSessions.length;
 
@@ -112,6 +135,49 @@ export class JellyfinCard extends BaseComponent {
         const songCount = itemCounts.SongCount || 0;
         const albumCount = itemCounts.AlbumCount || 0;
 
+        // Container stats (from Glances)
+        let containerStatsHtml = '';
+        if (containerData) {
+            const cpu = containerData.cpu?.total?.toFixed(1) || '0.0';
+            const mem = formatBytes(containerData.memory?.usage || 0);
+            const uptime = containerData.uptime || '--';
+            const status = containerData.status || containerData.Status;
+            const isRunning = status === 'running';
+
+            containerStatsHtml = `
+                <div class="jellyfin-container-stats">
+                    <div class="container-stat-item">
+                        <span class="stat-icon">⚡</span>
+                        <div class="stat-info">
+                            <span class="stat-label">CPU</span>
+                            <span class="stat-value">${cpu}%</span>
+                        </div>
+                    </div>
+                    <div class="container-stat-item">
+                        <span class="stat-icon">💾</span>
+                        <div class="stat-info">
+                            <span class="stat-label">Memory</span>
+                            <span class="stat-value">${mem}</span>
+                        </div>
+                    </div>
+                    <div class="container-stat-item">
+                        <span class="stat-icon">⏱️</span>
+                        <div class="stat-info">
+                            <span class="stat-label">Uptime</span>
+                            <span class="stat-value">${uptime}</span>
+                        </div>
+                    </div>
+                    <div class="container-stat-item">
+                        <span class="stat-icon">${isRunning ? '🟢' : '🔴'}</span>
+                        <div class="stat-info">
+                            <span class="stat-label">Status</span>
+                            <span class="stat-value">${status}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         let nowPlayingHtml = '';
         if (activeStreams > 0) {
             nowPlayingHtml = `
@@ -123,6 +189,8 @@ export class JellyfinCard extends BaseComponent {
         }
 
         const content = `
+            ${containerStatsHtml}
+
             <div class="jellyfin-stats">
                 <div class="jellyfin-stat">
                     <span class="stat-icon">🎬</span>

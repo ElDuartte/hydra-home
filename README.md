@@ -33,6 +33,10 @@ Create a `.env` file in the project root:
 # API Keys
 WEATHER_API_KEY=your_openweathermap_api_key_here
 
+# Jellyfin Integration (optional)
+JELLYFIN_URL=http://192.168.1.58:8096
+JELLYFIN_API_KEY=your_jellyfin_api_key_here
+
 # Glances API (leave as default)
 GLANCES_URL=http://localhost:61208/api/4
 GLANCES_UPDATE_INTERVAL=3000
@@ -41,7 +45,11 @@ GLANCES_UPDATE_INTERVAL=3000
 PORT=42069
 ```
 
-**Important**: Replace `your_openweathermap_api_key_here` with your actual API key.
+**Important**:
+- Replace `your_openweathermap_api_key_here` with your actual OpenWeatherMap API key
+- For Jellyfin integration:
+  - Replace `http://192.168.1.58:8096` with your Jellyfin server URL
+  - Replace `your_jellyfin_api_key_here` with your Jellyfin API key
 
 ### 3. Configure Dashboard Settings
 
@@ -81,9 +89,7 @@ Edit `variables.json` to customize your dashboard:
   },
 
   "jellyfin": {
-    "enabled": true,
-    "url": "http://localhost:8096",
-    "apiKey": "YOUR_JELLYFIN_API_KEY_HERE"
+    "enabled": true
   }
 }
 ```
@@ -108,13 +114,15 @@ Edit `variables.json` to customize your dashboard:
 
 - `jellyfin`: Jellyfin media server integration (optional)
   - `enabled`: Set to `true` to show Jellyfin card, `false` to hide
-  - `url`: URL to your Jellyfin server (e.g., `http://192.168.1.58:8096`)
-  - `apiKey`: Your Jellyfin API key
-    - To get an API key:
-      1. Open Jellyfin web interface
-      2. Go to Dashboard → API Keys
-      3. Click "+" to create a new key
-      4. Copy the key and paste it here
+  - URL and API key are configured in `.env` file:
+    - `JELLYFIN_URL`: URL to your Jellyfin server (e.g., `http://192.168.1.58:8096`)
+    - `JELLYFIN_API_KEY`: Your Jellyfin API key
+      - To get an API key:
+        1. Open Jellyfin web interface
+        2. Go to Dashboard → API Keys
+        3. Click "+" to create a new key
+        4. Copy the key and add it to your `.env` file
+  - **Note**: If Jellyfin is running as a Docker container, it will automatically be hidden from the regular Docker container list and shown in the special Jellyfin card instead, which displays both container stats and Jellyfin library information
 
 ### 4. Configure Firewall
 
