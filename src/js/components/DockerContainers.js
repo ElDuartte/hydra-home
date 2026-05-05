@@ -1,35 +1,31 @@
 /**
  * DockerContainers Component - Docker container list via Glances
+ * Uses centralized GlancesPoller for efficient, deduplicated polling.
  */
 
 import { BaseComponent } from './BaseComponent.js';
-import { GlancesAPI } from '../glances.js';
 import { formatBytes } from '../api.js';
 
 export class DockerContainers extends BaseComponent {
     defaults() {
         return {
-            glancesUrl: 'http://localhost:61208/api/3',
+            glancesPoller: null,
             updateInterval: 3000,
         };
     }
 
     async init() {
-        this.glances = new GlancesAPI(this.options.glancesUrl);
+        const poller = this.options.glancesPoller;
         this.html('<div class="loading">Loading containers...</div>');
-        await this.update();
-        this.startUpdates();
-    }
 
-    async update() {
-        const data = await this.glances.getDocker();
-
-        if (!data) {
-            this.renderError();
-            return;
-        }
-
-        this.renderContainers(data);
+        // Subscribe to containers endpoint with the centralized poller
+        this.unsubscribe = poller.subscribe('containers', (data) => {
+            if (data) {
+                this.renderContainers(data);
+            } else {
+                this.renderError();
+            }
+        }, this.options.updateInterval);
     }
 
     renderContainers(data) {
@@ -166,7 +162,6 @@ export class DockerContainers extends BaseComponent {
                 </button>
             </div>
         `);
-        this.container.addEventListener('retry', () => this.update(), { once: true });
     }
 
     formatUptime(seconds) {
@@ -183,5 +178,11 @@ export class DockerContainers extends BaseComponent {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    destroy() {
+        if (this.unsubscribe) {
+            this.unsubscribe();
+        }
     }
 }

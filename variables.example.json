@@ -22,7 +22,7 @@
   "clock": {
     "use24Hour": true,
     "showSeconds": true,
-    "locale": "es-ES"
+    "locale": "en-US"
   },
 
   "theme": {
@@ -30,5 +30,10 @@
     "--bg-card": "",
     "--accent-blue": "",
     "--accent-purple": ""
+  },
+
+  "jellyfin": {
+    "enabled": false
   }
 }
+

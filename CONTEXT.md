@@ -23,6 +23,7 @@ Real-time monitoring dashboard with read-only stats. Container controls planned 
 - **Frontend**: HTML/CSS/JS (see `src/`)
 - **Infrastructure**: Docker + Docker Compose
 - **Data sources**: System APIs (hardware stats), Docker API, external services (weather, time)
+- **Configuration**: Centralized backend ConfigLoader + frontend ConfigManager (see ADR-0001)
 
 ## Known constraints
 

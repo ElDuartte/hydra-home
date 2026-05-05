@@ -1,86 +1,67 @@
 /**
  * SystemStats Component - System statistics via Glances API
+ * Uses centralized GlancesPoller for efficient, deduplicated polling.
  */
 
 import { BaseComponent } from './BaseComponent.js';
-import { GlancesAPI } from '../glances.js';
 import { formatBytes } from '../api.js';
 
 export class SystemStats extends BaseComponent {
     defaults() {
         return {
-            glancesUrl: 'http://localhost:61208/api/3',
+            glancesPoller: null,
             updateInterval: 3000,
         };
     }
 
     async init() {
-        this.glances = new GlancesAPI(this.options.glancesUrl);
-        this.intervals = [];
+        this.glancesPoller = this.options.glancesPoller;
+        this.unsubscribers = [];
+
         this.render();
-        await this.update();
-        this.startUpdates();
-    }
 
-    async update() {
-        // Initial load - fetch all data immediately
-        const [cpu, mem, fs, sensors, gpu, network] = await Promise.all([
-            this.glances.getCpu(),
-            this.glances.getMem(),
-            this.glances.getFs(),
-            this.glances.getSensors(),
-            this.glances.getGpu(),
-            this.glances.getNetwork(),
-        ]);
+        // Subscribe to Glances endpoints with the centralized poller
+        // Each subscription specifies its own interval
+        this.unsubscribers.push(
+            this.glancesPoller.subscribe('cpu', (data) => {
+                if (data) this.updateCpu(data);
+            }, 2000)
+        );
 
-        if (cpu) this.updateCpu(cpu);
-        if (mem) this.updateRam(mem);
-        if (fs) this.updateDisks(fs);
-        if (sensors) this.updateTemps(sensors);
-        if (gpu?.length > 0) this.updateGpu(gpu);
-        if (network) this.updateNetwork(network);
-    }
+        this.unsubscribers.push(
+            this.glancesPoller.subscribe('mem', (data) => {
+                if (data) this.updateRam(data);
+            }, 1000)
+        );
 
-    startUpdates() {
-        // Different update intervals for each metric
-        // CPU: every 2 seconds (smooth updates)
-        this.intervals.push(setInterval(async () => {
-            const cpu = await this.glances.getCpu();
-            if (cpu) this.updateCpu(cpu);
-        }, 2000));
+        this.unsubscribers.push(
+            this.glancesPoller.subscribe('sensors', (data) => {
+                if (data) this.updateTemps(data);
+            }, 1000)
+        );
 
-        // RAM: every 1 second
-        this.intervals.push(setInterval(async () => {
-            const mem = await this.glances.getMem();
-            if (mem) this.updateRam(mem);
-        }, 1000));
+        this.unsubscribers.push(
+            this.glancesPoller.subscribe('fs', (data) => {
+                if (data) this.updateDisks(data);
+            }, 3600000)
+        );
 
-        // Temperatures: every 1 second
-        this.intervals.push(setInterval(async () => {
-            const sensors = await this.glances.getSensors();
-            if (sensors) this.updateTemps(sensors);
-        }, 1000));
+        this.unsubscribers.push(
+            this.glancesPoller.subscribe('network', (data) => {
+                if (data) this.updateNetwork(data);
+            }, 3000)
+        );
 
-        // Disks: every 1 hour
-        this.intervals.push(setInterval(async () => {
-            const fs = await this.glances.getFs();
-            if (fs) this.updateDisks(fs);
-        }, 3600000));
-
-        // Network & GPU: every 3 seconds (fast)
-        this.intervals.push(setInterval(async () => {
-            const [network, gpu] = await Promise.all([
-                this.glances.getNetwork(),
-                this.glances.getGpu(),
-            ]);
-            if (network) this.updateNetwork(network);
-            if (gpu?.length > 0) this.updateGpu(gpu);
-        }, 3000));
+        this.unsubscribers.push(
+            this.glancesPoller.subscribe('gpu', (data) => {
+                if (data?.length > 0) this.updateGpu(data);
+            }, 3000)
+        );
     }
 
     destroy() {
-        this.intervals.forEach(interval => clearInterval(interval));
-        this.intervals = [];
+        this.unsubscribers.forEach(unsubscribe => unsubscribe());
+        this.unsubscribers = [];
     }
 
     render() {

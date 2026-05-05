@@ -1,9 +1,9 @@
 /**
  * JellyfinCard Component - Displays Jellyfin server stats
+ * Uses centralized GlancesPoller for container stats; keeps Jellyfin API polling separate.
  */
 
 import { BaseComponent } from './BaseComponent.js';
-import { GlancesAPI } from '../glances.js';
 import { formatBytes } from '../api.js';
 
 export class JellyfinCard extends BaseComponent {
@@ -12,7 +12,7 @@ export class JellyfinCard extends BaseComponent {
             url: 'http://localhost:8096',
             webUrl: 'http://localhost:8096',
             apiKey: '',
-            glancesUrl: 'http://localhost:61208/api/3',
+            glancesPoller: null,
             updateInterval: 5000, // 5 seconds
         };
     }
@@ -21,8 +21,21 @@ export class JellyfinCard extends BaseComponent {
         this.jellyfinUrl = this.options.url; // For API calls via proxy
         this.jellyfinWebUrl = this.options.webUrl; // For browser access
         this.apiKey = this.options.apiKey;
-        this.glances = new GlancesAPI(this.options.glancesUrl);
+        this.glancesPoller = this.options.glancesPoller;
+
+        // Cache for data
+        this.jellyfinData = null;
+        this.containerData = null;
+
         this.render();
+
+        // Subscribe to containers via poller
+        this.unsubscribeContainers = this.glancesPoller.subscribe('containers', (data) => {
+            this.containerData = data;
+            this.updateRenderedContent();
+        }, 3000);
+
+        // Fetch initial Jellyfin data and start polling it
         await this.update();
         this.startUpdates();
     }
@@ -53,14 +66,14 @@ export class JellyfinCard extends BaseComponent {
 
     async update() {
         try {
-            const [systemInfo, itemCounts, containerData] = await Promise.all([
+            const [systemInfo, itemCounts] = await Promise.all([
                 this.fetchJellyfin('/System/Info'),
                 this.fetchJellyfin('/Items/Counts'),
-                this.fetchContainerStats(),
             ]);
 
+            this.jellyfinData = { systemInfo, itemCounts };
             this.updateStatus(true);
-            this.renderContent({ systemInfo, itemCounts, containerData });
+            this.updateRenderedContent();
         } catch (error) {
             console.error('Jellyfin API error:', error);
             this.updateStatus(false);
@@ -68,21 +81,26 @@ export class JellyfinCard extends BaseComponent {
         }
     }
 
-    async fetchContainerStats() {
-        try {
-            const containers = await this.glances.getDocker();
-            if (!containers) return null;
+    /**
+     * Re-render when either Jellyfin data or container data arrives.
+     */
+    updateRenderedContent() {
+        if (this.jellyfinData) {
+            // Extract Jellyfin container from containers list if available
+            let containerData = null;
+            if (this.containerData) {
+                const containers = Array.isArray(this.containerData) ? this.containerData : (this.containerData.containers || []);
+                containerData = containers.find(c => {
+                    const name = (c.name || '').toLowerCase();
+                    return name.includes('jellyfin');
+                }) || null;
+            }
 
-            // Find Jellyfin container
-            const jellyfinContainer = containers.find(c => {
-                const name = (c.name || '').toLowerCase();
-                return name.includes('jellyfin');
+            this.renderContent({
+                systemInfo: this.jellyfinData.systemInfo,
+                itemCounts: this.jellyfinData.itemCounts,
+                containerData,
             });
-
-            return jellyfinContainer || null;
-        } catch (error) {
-            console.error('Failed to fetch container stats:', error);
-            return null;
         }
     }
 
@@ -211,5 +229,14 @@ export class JellyfinCard extends BaseComponent {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    destroy() {
+        // Unsubscribe from containers polling
+        if (this.unsubscribeContainers) {
+            this.unsubscribeContainers();
+        }
+        // Clean up Jellyfin API polling
+        super.destroy();
     }
 }

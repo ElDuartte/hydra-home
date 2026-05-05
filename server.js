@@ -1,73 +1,24 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
 require('dotenv').config();
+const ConfigLoader = require('./lib/config-loader');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+
+// Load config at startup
+const configLoader = new ConfigLoader(path.join(__dirname, 'variables.json'));
+configLoader.load();
+configLoader.logWarnings();
+
+const backendConfig = configLoader.getBackendConfig();
+const PORT = backendConfig.port;
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'src')));
 
-// Load variables.json with defaults
-function loadVariables() {
-    const filePath = path.join(__dirname, 'variables.json');
-
-    const defaults = {
-        mainLocation: { city: 'Madrid', country: 'ES', lat: 40.4168, lon: -3.7038, units: 'metric' },
-        weatherCities: [],
-        clockCities: [],
-        clock: { use24Hour: true, showSeconds: true, locale: 'es-ES' },
-        theme: {},
-        jellyfin: { enabled: false },
-    };
-
-    try {
-        if (fs.existsSync(filePath)) {
-            const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-            return { ...defaults, ...data };
-        }
-    } catch (error) {
-        console.error('Error reading variables.json:', error.message);
-    }
-
-    return defaults;
-}
-
-// Build config for frontend
-function getConfig() {
-    const vars = loadVariables();
-
-    // Filter empty theme values
-    const theme = {};
-    if (vars.theme) {
-        Object.entries(vars.theme).forEach(([key, value]) => {
-            if (value) theme[key] = value;
-        });
-    }
-
-    return {
-        glances: {
-            url: '/api/glances',  // Use server proxy to avoid CORS
-            updateInterval: parseInt(process.env.GLANCES_UPDATE_INTERVAL) || 3000,
-        },
-        location: vars.mainLocation,
-        clock: vars.clock,
-        weatherCities: vars.weatherCities || [],
-        clockCities: vars.clockCities || [],
-        theme,
-        jellyfin: {
-            enabled: vars.jellyfin?.enabled || false,
-            url: process.env.JELLYFIN_URL || 'http://localhost:8096',
-            webUrl: process.env.JELLYFIN_WEB_URL || process.env.JELLYFIN_URL || 'http://localhost:8096',
-            apiKey: process.env.JELLYFIN_API_KEY || '',
-        },
-    };
-}
-
 // API: Dashboard config
 app.get('/api/config', (req, res) => {
-    res.json(getConfig());
+    res.json(configLoader.getFrontendConfig());
 });
 
 // API: Glances proxy (avoids CORS issues)

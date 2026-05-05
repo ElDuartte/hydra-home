@@ -2,7 +2,9 @@
  * Main.js - Dashboard entry point
  */
 
-import { loadConfig } from './config.js';
+import { configManager } from './config-manager.js';
+import { GlancesAPI } from './glances.js';
+import { GlancesPoller } from './glances-poller.js';
 import { Clock } from './components/Clock.js';
 import { Weather, WeatherMini } from './components/Weather.js';
 import { SystemStats } from './components/SystemStats.js';
@@ -18,13 +20,17 @@ class Dashboard {
     constructor() {
         this.components = [];
         this.config = null;
+        this.glancesPoller = null;
     }
 
-    async init() {
+    async init(config) {
         console.log('🚀 Starting Hydra Dashboard...');
 
-        // Load config from server
-        this.config = await loadConfig();
+        this.config = config;
+
+        // Create Glances poller (single instance shared by all components)
+        const glancesApi = new GlancesAPI(config.glances.url);
+        this.glancesPoller = new GlancesPoller(glancesApi);
 
         // Apply theme and layout
         this.applyTheme();
@@ -32,6 +38,9 @@ class Dashboard {
 
         // Initialize components
         await this.initComponents();
+
+        // Start Glances poller after all components are subscribed
+        this.glancesPoller.start();
 
         console.log('✅ Dashboard ready');
     }
@@ -79,7 +88,7 @@ class Dashboard {
 
         // Docker containers
         await this.initComponent('docker-containers', DockerContainers, {
-            glancesUrl: config.glances.url,
+            glancesPoller: this.glancesPoller,
             updateInterval: config.glances.updateInterval,
         });
 
@@ -89,13 +98,13 @@ class Dashboard {
                 url: config.jellyfin.url,
                 webUrl: config.jellyfin.webUrl,
                 apiKey: config.jellyfin.apiKey,
-                glancesUrl: config.glances.url,
+                glancesPoller: this.glancesPoller,
             });
         }
 
         // System stats
         await this.initComponent('system-stats', SystemStats, {
-            glancesUrl: config.glances.url,
+            glancesPoller: this.glancesPoller,
             updateInterval: config.glances.updateInterval,
         });
     }
@@ -152,12 +161,78 @@ class Dashboard {
     destroy() {
         this.components.forEach(c => c.destroy?.());
         this.components = [];
+        if (this.glancesPoller) {
+            this.glancesPoller.destroy();
+        }
     }
 }
 
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
     const dashboard = new Dashboard();
-    dashboard.init();
-    window.dashboard = dashboard;
+
+    // Subscribe to config ready event
+    configManager.onReady((config) => {
+        dashboard.init(config);
+        window.dashboard = dashboard;
+    });
+
+    // Subscribe to config failed event
+    configManager.onFailed((error) => {
+        console.error('Config load failed:', error);
+        showConfigError(error);
+    });
+
+    // Start loading config
+    configManager.load();
 });
+
+/**
+ * Show error UI when config fails to load.
+ */
+function showConfigError(error) {
+    const root = document.getElementById('root') || document.body;
+    root.innerHTML = `
+        <div style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #1a1a1a;
+            color: #fff;
+            font-family: system-ui, -apple-system, sans-serif;
+        ">
+            <div style="
+                text-align: center;
+                padding: 2rem;
+                background: #2a2a2a;
+                border-radius: 8px;
+                max-width: 500px;
+            ">
+                <h1 style="margin: 0 0 1rem 0; color: #ff6b6b;">⚠️ Configuration Error</h1>
+                <p style="margin: 0 0 1rem 0; color: #aaa;">Failed to load configuration file.</p>
+                <pre style="
+                    background: #1a1a1a;
+                    padding: 1rem;
+                    border-radius: 4px;
+                    text-align: left;
+                    color: #ff9999;
+                    overflow-x: auto;
+                    margin: 1rem 0;
+                ">Error: ${escapeHtml(error)}</pre>
+                <p style="margin: 1rem 0 0 0; color: #888; font-size: 0.9rem;">
+                    Please check your configuration and server logs.
+                </p>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Simple HTML escape to prevent XSS.
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
