@@ -4,7 +4,7 @@
  */
 
 import { BaseComponent } from './BaseComponent.js';
-import { formatBytes } from '../api.js';
+import { formatBytes } from '../format.js';
 
 export class SystemStats extends BaseComponent {
     defaults() {

@@ -44,15 +44,14 @@ export class JellyfinNowPlaying extends BaseComponent {
     renderSessions(sessions) {
         const activeSessions = sessions.filter(s => s.NowPlayingItem);
 
-        // Hide the entire row if nothing is playing
-        const row3 = document.querySelector('.center-row-3');
+        // Hide the component if nothing is playing
         if (activeSessions.length === 0) {
-            if (row3) row3.style.display = 'none';
+            this.container.style.display = 'none';
             return;
         }
 
-        // Show the row if there are active sessions
-        if (row3) row3.style.display = 'block';
+        // Show the component if there are active sessions
+        this.container.style.display = 'block';
 
         const html = `
             <div class="now-playing-header">

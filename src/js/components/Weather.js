@@ -3,7 +3,7 @@
  */
 
 import { BaseComponent } from './BaseComponent.js';
-import { fetchWeather, getWeatherEmoji } from '../api.js';
+import { fetchWeather, getWeatherEmoji } from '../weather-api.js';
 
 export class Weather extends BaseComponent {
     defaults() {
