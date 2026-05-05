@@ -110,43 +110,40 @@ class Dashboard {
     }
 
     async initCityCards(config) {
-        // Austin city card
-        const austinCity = config.weatherCities.find(c => c.name.toLowerCase().includes('austin'));
-        const austinClock = config.clockCities.find(c => c.name.toLowerCase().includes('austin'));
+        // Iterate weather cities and initialize cards from config
+        for (const weatherCity of config.weatherCities) {
+            const slug = this.slugify(weatherCity.name);
+            const clockCity = config.clockCities.find(c => c.name === weatherCity.name);
 
-        if (austinCity && austinClock) {
-            const austinCard = document.getElementById('city-card-austin');
-            if (austinCard) {
-                const instance = new CityCard(austinCard, {
-                    city: austinCity.name,
-                    lat: austinCity.lat,
-                    lon: austinCity.lon,
-                    timezone: austinClock.timezone,
-                    units: config.location.units || 'metric',
-                });
-                await instance.init();
-                this.components.push(instance);
-            }
+            if (!clockCity) continue;
+
+            // Find card element by data-city-slug attribute
+            const cardEl = document.querySelector(`[data-city-slug="${slug}"]`);
+            if (!cardEl) continue;
+
+            const instance = new CityCard(cardEl, {
+                city: weatherCity.name,
+                lat: weatherCity.lat,
+                lon: weatherCity.lon,
+                timezone: clockCity.timezone,
+                units: config.location.units || 'metric',
+            });
+            await instance.init();
+            this.components.push(instance);
         }
+    }
 
-        // Bogotá city card
-        const bogotaCity = config.weatherCities.find(c => c.name.toLowerCase().includes('bogot'));
-        const bogotaClock = config.clockCities.find(c => c.name.toLowerCase().includes('bogot'));
-
-        if (bogotaCity && bogotaClock) {
-            const bogotaCard = document.getElementById('city-card-bogota');
-            if (bogotaCard) {
-                const instance = new CityCard(bogotaCard, {
-                    city: bogotaCity.name,
-                    lat: bogotaCity.lat,
-                    lon: bogotaCity.lon,
-                    timezone: bogotaClock.timezone,
-                    units: config.location.units || 'metric',
-                });
-                await instance.init();
-                this.components.push(instance);
-            }
-        }
+    /**
+     * Convert a name to a slug suitable for use in data attributes.
+     * Handles international characters (e.g. "Bogotá" → "bogota").
+     */
+    slugify(name) {
+        return name
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[̀-ͯ]/g, '') // Remove accents
+            .replace(/[^a-z0-9]/g, '-')       // Non-alphanumeric → dash
+            .replace(/-+/g, '-');              // Collapse multiple dashes
     }
 
     async initComponent(id, Component, options) {

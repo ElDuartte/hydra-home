@@ -2,20 +2,27 @@
  * GlancesPoller — Centralized polling for Glances endpoints
  *
  * Deduplicates requests: if multiple components subscribe to the same endpoint,
- * only one HTTP fetch is made. Each endpoint has its own timer based on the
- * fastest subscriber. Delivers data to all subscribers via callbacks.
+ * only one HTTP fetch is made. Uses tick-based scheduling (1000ms master tick)
+ * to reduce timer overhead and eliminate drift between related endpoints.
+ *
+ * Each subscription has a tickEvery = interval / 1000. Endpoints fetch when
+ * tickCount % tickEvery === 0, ensuring endpoints with the same interval
+ * always fire together.
  */
 
 export class GlancesPoller {
-    constructor(glancesApi) {
+    constructor(glancesApi, baseTick = 1000) {
         this.glancesApi = glancesApi;
-        this.subscriptions = new Map(); // endpoint → { interval, callbacks: Set, timerId }
+        this.baseTick = baseTick; // ms, typically 1000
+        this.subscriptions = new Map(); // endpoint → { tickEvery, callbacks: Set }
+        this.tickCount = 0;
+        this.masterTimerId = null;
         this.isRunning = false;
     }
 
     /**
      * Subscribe to an endpoint with a callback and polling interval.
-     * If endpoint already subscribed, uses min(existing interval, new interval).
+     * If endpoint already subscribed, uses min(tickEvery from all subscribers).
      * Returns unsubscribe function.
      */
     subscribe(endpoint, callback, interval) {
@@ -23,33 +30,28 @@ export class GlancesPoller {
             throw new Error('endpoint and callback required');
         }
 
+        const tickEvery = Math.max(1, Math.round((interval || 3000) / this.baseTick));
         const sub = this.subscriptions.get(endpoint);
 
         if (sub) {
             // Endpoint already subscribed
             sub.callbacks.add(callback);
 
-            // Update interval if this subscriber wants faster polling
-            if (interval && interval < sub.interval) {
-                sub.interval = interval;
-                if (sub.timerId) {
-                    clearInterval(sub.timerId);
-                    sub.timerId = this._startTimer(endpoint);
-                }
+            // Update tickEvery if this subscriber wants faster polling
+            if (tickEvery < sub.tickEvery) {
+                sub.tickEvery = tickEvery;
             }
         } else {
             // New endpoint subscription
             this.subscriptions.set(endpoint, {
-                interval: interval || 3000,
+                tickEvery,
                 callbacks: new Set([callback]),
-                timerId: null,
             });
+        }
 
-            // Start timer if poller is running
-            if (this.isRunning) {
-                const sub = this.subscriptions.get(endpoint);
-                sub.timerId = this._startTimer(endpoint);
-            }
+        // If poller is running, immediately fetch (warm start)
+        if (this.isRunning) {
+            this._fetch(endpoint);
         }
 
         // Return unsubscribe function
@@ -58,7 +60,7 @@ export class GlancesPoller {
 
     /**
      * Unsubscribe a callback from an endpoint.
-     * Stops the endpoint timer if no callbacks remain.
+     * Removes endpoint if no callbacks remain.
      */
     unsubscribe(endpoint, callback) {
         const sub = this.subscriptions.get(endpoint);
@@ -66,25 +68,27 @@ export class GlancesPoller {
 
         sub.callbacks.delete(callback);
 
-        // Stop timer if no more callbacks
+        // Remove endpoint if no more callbacks
         if (sub.callbacks.size === 0) {
-            if (sub.timerId) {
-                clearInterval(sub.timerId);
-            }
             this.subscriptions.delete(endpoint);
         }
     }
 
     /**
-     * Start polling for all subscribed endpoints.
+     * Start polling for all subscribed endpoints using master tick.
      */
     start() {
         if (this.isRunning) return;
         this.isRunning = true;
+        this.tickCount = 0;
 
-        for (const [endpoint, sub] of this.subscriptions.entries()) {
-            sub.timerId = this._startTimer(endpoint);
+        // Immediate first fetch for all endpoints
+        for (const endpoint of this.subscriptions.keys()) {
+            this._fetch(endpoint);
         }
+
+        // Start master tick
+        this.masterTimerId = setInterval(() => this._tick(), this.baseTick);
     }
 
     /**
@@ -93,11 +97,9 @@ export class GlancesPoller {
     stop() {
         this.isRunning = false;
 
-        for (const sub of this.subscriptions.values()) {
-            if (sub.timerId) {
-                clearInterval(sub.timerId);
-                sub.timerId = null;
-            }
+        if (this.masterTimerId) {
+            clearInterval(this.masterTimerId);
+            this.masterTimerId = null;
         }
     }
 
@@ -110,17 +112,17 @@ export class GlancesPoller {
     }
 
     /**
-     * Start a timer for an endpoint. Called internally.
+     * Master tick. Called every baseTick ms.
+     * Increments counter; fetches endpoints where tickCount % tickEvery === 0.
      */
-    _startTimer(endpoint) {
-        const sub = this.subscriptions.get(endpoint);
-        if (!sub) return null;
+    _tick() {
+        this.tickCount++;
 
-        // Initial fetch immediately
-        this._fetch(endpoint);
-
-        // Then poll at interval
-        return setInterval(() => this._fetch(endpoint), sub.interval);
+        for (const [endpoint, sub] of this.subscriptions.entries()) {
+            if (this.tickCount % sub.tickEvery === 0) {
+                this._fetch(endpoint);
+            }
+        }
     }
 
     /**

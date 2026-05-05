@@ -22,6 +22,9 @@ export const THEMES = {
             '--accent-yellow': '#e0af68',
             '--border-color': '#292e42',
             '--shadow-color': 'rgba(0, 0, 0, 0.3)',
+            '--accent-jellyfin': '#00a4dc',
+            '--bg-warning': 'rgba(255, 158, 100, 0.1)',
+            '--bg-critical': 'rgba(247, 118, 142, 0.1)',
         }
     },
     'gruvbox': {
@@ -43,6 +46,9 @@ export const THEMES = {
             '--accent-yellow': '#fabd2f',
             '--border-color': '#504945',
             '--shadow-color': 'rgba(0, 0, 0, 0.5)',
+            '--accent-jellyfin': '#00a4dc',
+            '--bg-warning': 'rgba(254, 128, 25, 0.1)',
+            '--bg-critical': 'rgba(251, 73, 52, 0.1)',
         }
     },
     'gruvbox-light': {
@@ -64,6 +70,9 @@ export const THEMES = {
             '--accent-yellow': '#b57614',
             '--border-color': '#d5c4a1',
             '--shadow-color': 'rgba(0, 0, 0, 0.1)',
+            '--accent-jellyfin': '#00a4dc',
+            '--bg-warning': 'rgba(175, 58, 3, 0.12)',
+            '--bg-critical': 'rgba(157, 0, 6, 0.12)',
         }
     },
     'onedark': {
@@ -85,6 +94,33 @@ export const THEMES = {
             '--accent-yellow': '#e5c07b',
             '--border-color': '#3e4451',
             '--shadow-color': 'rgba(0, 0, 0, 0.4)',
+            '--accent-jellyfin': '#00a4dc',
+            '--bg-warning': 'rgba(209, 154, 102, 0.1)',
+            '--bg-critical': 'rgba(224, 108, 117, 0.1)',
+        }
+    },
+    'cyberpunk': {
+        name: 'Cyberpunk',
+        colors: {
+            '--bg-primary': '#0a0a0f',
+            '--bg-secondary': '#050507',
+            '--bg-tertiary': '#12121a',
+            '--bg-card': '#0e0e17',
+            '--text-primary': '#e0e0ff',
+            '--text-secondary': '#9090cc',
+            '--text-muted': '#505099',
+            '--accent-blue': '#00e5ff',
+            '--accent-purple': '#ff00ff',
+            '--accent-cyan': '#00ffff',
+            '--accent-green': '#39ff14',
+            '--accent-orange': '#ff6600',
+            '--accent-red': '#ff0040',
+            '--accent-yellow': '#ffff00',
+            '--border-color': '#1a1a3a',
+            '--shadow-color': 'rgba(0, 229, 255, 0.15)',
+            '--accent-jellyfin': '#00e5ff',
+            '--bg-warning': 'rgba(255, 102, 0, 0.15)',
+            '--bg-critical': 'rgba(255, 0, 64, 0.15)',
         }
     }
 };
