@@ -29,3 +29,10 @@ services:
         max-size: "1m"
         max-file: "2"
     restart: unless-stopped
+
+  bentopdf:
+    # http://192.168.1.58:42070/
+    image: ghcr.io/alam00000/bentopdf:latest
+    ports:
+      - '42070:8080'
+    restart: unless-stopped

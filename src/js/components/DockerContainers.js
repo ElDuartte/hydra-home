@@ -105,7 +105,8 @@ export class DockerContainers extends BaseComponent {
 
         let metaHtml = '';
         if (ports) {
-            metaHtml = `<div class="container-meta"><span class="container-ports">${this.escape(ports)}</span></div>`;
+            const portLinks = this.createPortLinks(ports);
+            metaHtml = `<div class="container-meta">${portLinks}</div>`;
         }
 
         return `
@@ -121,6 +122,26 @@ export class DockerContainers extends BaseComponent {
                 ${metaHtml}
             </div>
         `;
+    }
+
+    createPortLinks(portsStr) {
+        if (!portsStr) return '';
+
+        const getHostIP = () => {
+            const host = window.location.hostname;
+            return host === 'localhost' || host === '127.0.0.1' ? 'localhost' : host;
+        };
+
+        const hostIP = getHostIP();
+        const portMappings = portsStr.split(', ');
+
+        return portMappings.map(mapping => {
+            const [hostPort] = mapping.split(':');
+            if (!hostPort) return this.escape(mapping);
+
+            const url = `http://${hostIP}:${hostPort.trim()}/`;
+            return `<a href="${this.escape(url)}" target="_blank" rel="noopener noreferrer" class="container-port-link">${this.escape(mapping)}</a>`;
+        }).join(', ');
     }
 
     renderError() {

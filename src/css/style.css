@@ -759,6 +759,18 @@ body {
     grid-row: 3;
 }
 
+.container-port-link {
+    color: var(--accent-cyan);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--accent-cyan);
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.container-port-link:hover {
+    opacity: 0.7;
+}
+
 .container-stopped-label {
     font-size: 0.7rem;
     color: var(--text-muted);
