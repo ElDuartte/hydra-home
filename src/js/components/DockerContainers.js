@@ -140,7 +140,7 @@ export class DockerContainers extends BaseComponent {
             if (!hostPort) return this.escape(mapping);
 
             const url = `http://${hostIP}:${hostPort.trim()}/`;
-            return `<a href="${this.escape(url)}" target="_blank" rel="noopener noreferrer" class="container-port-link">${this.escape(mapping)}</a>`;
+            return `<a href="${this.escape(url)}" target="_blank" rel="noopener noreferrer" class="container-port-link">🔗 ${this.escape(mapping)}</a>`;
         }).join(', ');
     }
 

@@ -762,9 +762,11 @@ body {
 .container-port-link {
     color: var(--accent-cyan);
     text-decoration: none;
-    border-bottom: 1px dotted var(--accent-cyan);
     cursor: pointer;
     transition: opacity 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
 }
 
 .container-port-link:hover {
