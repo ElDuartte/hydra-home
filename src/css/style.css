@@ -1655,7 +1655,7 @@ body {
    Cyberpunk Theme - Glow Effects & Colorful Zones
    ======================================== */
 
-/* Column zone borders with neon colors */
+/* Column zone borders with neon colors
 [data-theme="cyberpunk"] .column-left {
     border-left: 2px solid var(--accent-purple);
     box-shadow: inset 2px 0 10px rgba(255, 0, 255, 0.15);
@@ -1669,7 +1669,7 @@ body {
 [data-theme="cyberpunk"] .column-right {
     border-right: 2px solid var(--accent-green);
     box-shadow: inset -2px 0 10px rgba(57, 255, 20, 0.15);
-}
+} */
 
 /* Cards and containers with glow */
 [data-theme="cyberpunk"] .jellyfin-card,
