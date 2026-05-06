@@ -8,7 +8,6 @@ export class BaseComponent {
         this.options = { ...this.defaults(), ...options };
         this.intervalId = null;
         this._subscriptions = [];
-        this._renderedHtml = null;
     }
 
     /** Override in subclass to provide default options */
@@ -55,8 +54,6 @@ export class BaseComponent {
 
     /** Helper to set innerHTML */
     html(content) {
-        if (content === this._renderedHtml) return;
-        this._renderedHtml = content;
         this.container.innerHTML = content;
     }
 
