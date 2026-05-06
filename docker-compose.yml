@@ -1,8 +1,10 @@
 services:
   dashboard:
+    # http://192.168.1.58:42069/
     build: .
     container_name: hydra-dashboard
-    network_mode: host
+    ports:
+      - '42069:42069'
     volumes:
       - ./variables.json:/app/variables.json:ro
       - ./src:/app/src:ro
@@ -13,11 +15,13 @@ services:
     restart: unless-stopped
 
   glances:
+    # http://192.168.1.58:61208/
     image: nicolargo/glances:latest-full
     container_name: hydra-glances
     pid: host
     privileged: true
-    network_mode: host
+    ports:
+      - '61208:61208'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/os-release:/etc/os-release:ro
