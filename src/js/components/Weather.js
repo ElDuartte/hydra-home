@@ -17,6 +17,13 @@ export class Weather extends BaseComponent {
         };
     }
 
+    startUpdates() {
+        const interval = this.options.updateInterval || this.defaults().updateInterval;
+        if (interval && interval > 0) {
+            this.intervalId = setInterval(() => this.update(), interval);
+        }
+    }
+
     render() {
         this.html('<div class="loading">Loading...</div>');
     }
