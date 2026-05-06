@@ -103,10 +103,10 @@ export class DockerContainers extends BaseComponent {
             `;
         }
 
-        // Add ports if available
+        let portHtml = '';
         if (ports) {
             const portLinks = this.createPortLinks(ports);
-            statsHtml += `<div class="container-stat">${portLinks}</div>`;
+            portHtml = `<div class="container-port-line">${portLinks}</div>`;
         }
 
         return `
@@ -115,6 +115,7 @@ export class DockerContainers extends BaseComponent {
                     <span class="container-status">${statusIcon}</span>
                     <span class="container-name">${this.escape(c.name)}</span>
                 </div>
+                ${portHtml}
                 <div class="container-image" title="${this.escape(c.id || '')}">${this.escape(imageWithId)}</div>
                 <div class="container-stats">
                     ${statsHtml}

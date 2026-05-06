@@ -707,6 +707,14 @@ body {
     color: var(--text-primary);
 }
 
+.container-port-line {
+    font-size: 0.7rem;
+    color: var(--accent-cyan);
+    margin-top: 0;
+    margin-left: 0;
+    white-space: nowrap;
+}
+
 .container-image {
     font-size: 0.7rem;
     color: var(--text-muted);
@@ -764,10 +772,6 @@ body {
     text-decoration: none;
     cursor: pointer;
     transition: opacity 0.2s;
-    font-size: 0.7rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
 }
 
 .container-port-link:hover {
