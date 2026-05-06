@@ -39,7 +39,6 @@ export class CityCard extends BaseComponent {
             });
             this.renderWeather(data);
         } catch (error) {
-            console.error('Weather error:', error);
             this.renderWeatherError();
         }
     }
