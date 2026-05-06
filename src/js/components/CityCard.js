@@ -95,8 +95,8 @@ export class CityCard extends BaseComponent {
     }
 
     startUpdates() {
-        // Update weather every 30 minutes
-        this.intervals.push(setInterval(() => this.updateWeather(), this.options.updateInterval));
+        // Weather disabled temporarily (API not available)
+        // this.intervals.push(setInterval(() => this.updateWeather(), this.options.updateInterval));
 
         // Update time every second
         this.intervals.push(setInterval(() => this.updateTime(), 1000));
