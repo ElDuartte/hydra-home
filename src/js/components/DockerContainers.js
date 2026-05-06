@@ -4,7 +4,8 @@
  */
 
 import { BaseComponent } from './BaseComponent.js';
-import { formatBytes } from '../format.js';
+import { formatBytes, formatBytesPerSec, formatUptime } from '../format.js';
+import { normalizeContainersPayload, filterJellyfinContainers, sortContainersByStatus, normalizeImageName, extractContainerStats } from '../transforms.js';
 
 export class DockerContainers extends BaseComponent {
     defaults() {
@@ -19,24 +20,18 @@ export class DockerContainers extends BaseComponent {
         this.html('<div class="loading">Loading containers...</div>');
 
         // Subscribe to containers endpoint with the centralized poller
-        this.unsubscribe = poller.subscribe('containers', (data) => {
+        this.trackSubscription(poller.subscribe('containers', (data) => {
             if (data) {
                 this.renderContainers(data);
             } else {
                 this.renderError();
             }
-        }, this.options.updateInterval);
+        }, this.options.updateInterval));
     }
 
     renderContainers(data) {
-        // Handle both API v3 (data.containers) and v4 (data is array) formats
-        let containers = Array.isArray(data) ? data : (data.containers || []);
-
-        // Filter out Jellyfin container (it has its own special card)
-        containers = containers.filter(c => {
-            const name = (c.name || '').toLowerCase();
-            return !name.includes('jellyfin');
-        });
+        let containers = normalizeContainersPayload(data);
+        containers = filterJellyfinContainers(containers);
 
         if (containers.length === 0) {
             this.html(`
@@ -48,15 +43,7 @@ export class DockerContainers extends BaseComponent {
             return;
         }
 
-        // Sort: running first, then by name
-        const sorted = containers.sort((a, b) => {
-            const aStatus = a.Status || a.status;
-            const bStatus = b.Status || b.status;
-            if (aStatus === 'running' && bStatus !== 'running') return -1;
-            if (bStatus === 'running' && aStatus !== 'running') return 1;
-            return a.name.localeCompare(b.name);
-        });
-
+        const sorted = sortContainersByStatus(containers);
         const html = sorted.map(c => this.renderContainer(c)).join('');
 
         this.html(`
@@ -73,12 +60,7 @@ export class DockerContainers extends BaseComponent {
         const isRunning = status === 'running';
         const statusIcon = isRunning ? '🟢' : '🔴';
 
-        // Handle both string and array format for image
-        let imageRaw = c.Image || c.image || 'unknown';
-        if (Array.isArray(imageRaw)) imageRaw = imageRaw[0] || 'unknown';
-        const image = imageRaw.split(':')[0].split('/').pop();
-
-        // Container ID (shortened)
+        const image = normalizeImageName(c.Image || c.image || 'unknown');
         const shortId = (c.id || '').substring(0, 12);
         const imageWithId = shortId ? `${image} - ${shortId}` : image;
 
@@ -95,20 +77,20 @@ export class DockerContainers extends BaseComponent {
             `;
         }
 
-        const cpu = c.cpu?.total?.toFixed(1) || '0.0';
-        const mem = formatBytes(c.memory?.usage || 0);
-        const uptime = c.uptime || this.formatUptime(c.Uptime);
+        const stats = extractContainerStats(c);
+        const mem = formatBytes(stats.mem);
+        const uptime = stats.uptime || formatUptime(stats.uptimeSecs);
 
         // I/O rates
         const io = c.io || {};
-        const ioRead = this.formatIORate(io.ior || 0);
-        const ioWrite = this.formatIORate(io.iow || 0);
+        const ioRead = formatBytesPerSec(io.ior || 0);
+        const ioWrite = formatBytesPerSec(io.iow || 0);
 
         // Ports
         const ports = c.ports || '';
 
         let statsHtml = `
-            <div class="container-stat"><span class="stat-icon">⚡</span> ${cpu}%</div>
+            <div class="container-stat"><span class="stat-icon">⚡</span> ${stats.cpu}%</div>
             <div class="container-stat"><span class="stat-icon">💾</span> ${mem}</div>
             <div class="container-stat"><span class="stat-icon">⏱️</span> ${uptime}</div>
         `;
@@ -141,17 +123,6 @@ export class DockerContainers extends BaseComponent {
         `;
     }
 
-    formatIORate(bytesPerSec) {
-        if (!bytesPerSec) return '0 B/s';
-        const units = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
-        let i = 0;
-        while (bytesPerSec >= 1024 && i < units.length - 1) {
-            bytesPerSec /= 1024;
-            i++;
-        }
-        return `${bytesPerSec.toFixed(1)} ${units[i]}`;
-    }
-
     renderError() {
         this.html(`
             <div class="docker-error">
@@ -174,15 +145,7 @@ export class DockerContainers extends BaseComponent {
         return `${m}m`;
     }
 
-    escape(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
     destroy() {
-        if (this.unsubscribe) {
-            this.unsubscribe();
-        }
+        super.destroy();
     }
 }

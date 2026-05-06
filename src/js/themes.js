@@ -137,6 +137,9 @@ export function applyTheme(themeId) {
         root.style.setProperty(prop, value);
     });
 
+    // Set data-theme attribute for CSS-based theme variants
+    root.setAttribute('data-theme', themeId);
+
     // Save preference to localStorage
     localStorage.setItem('hydra-theme', themeId);
 }

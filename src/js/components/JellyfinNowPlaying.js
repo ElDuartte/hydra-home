@@ -3,6 +3,8 @@
  */
 
 import { BaseComponent } from './BaseComponent.js';
+import { filterActiveSessions, calcPlaybackPercent, buildSessionMetadata } from '../transforms.js';
+import { fetchJellyfin } from '../jellyfin-api.js';
 
 export class JellyfinNowPlaying extends BaseComponent {
     defaults() {
@@ -23,7 +25,7 @@ export class JellyfinNowPlaying extends BaseComponent {
 
     async update() {
         try {
-            const sessions = await this.fetchJellyfin('/Sessions');
+            const sessions = await fetchJellyfin('/Sessions');
             this.renderSessions(sessions);
         } catch (error) {
             console.error('Jellyfin API error:', error);
@@ -31,18 +33,8 @@ export class JellyfinNowPlaying extends BaseComponent {
         }
     }
 
-    async fetchJellyfin(endpoint) {
-        const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
-        const url = `/api/jellyfin/${cleanEndpoint}`;
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        return await response.json();
-    }
-
     renderSessions(sessions) {
-        const activeSessions = sessions.filter(s => s.NowPlayingItem);
+        const activeSessions = filterActiveSessions(sessions);
 
         // Hide the component if nothing is playing
         if (activeSessions.length === 0) {
@@ -70,11 +62,10 @@ export class JellyfinNowPlaying extends BaseComponent {
         const userName = session.UserName || 'Unknown';
         const deviceName = session.DeviceName || 'Unknown Device';
         const itemName = item.Name || 'Unknown';
-        const itemType = item.Type || '';
 
         let progress = '';
-        if (item.RunTimeTicks && session.PlayState?.PositionTicks) {
-            const percent = Math.round((session.PlayState.PositionTicks / item.RunTimeTicks) * 100);
+        const percent = calcPlaybackPercent(session.PlayState?.PositionTicks, item.RunTimeTicks);
+        if (percent !== null) {
             progress = `
                 <div class="playback-progress">
                     <div class="progress-bar">
@@ -85,15 +76,8 @@ export class JellyfinNowPlaying extends BaseComponent {
             `;
         }
 
-        let metadata = '';
-        if (itemType === 'Episode') {
-            const series = item.SeriesName || '';
-            const season = item.ParentIndexNumber || 0;
-            const episode = item.IndexNumber || 0;
-            metadata = `<div class="session-metadata">${series} - S${season}E${episode}</div>`;
-        } else if (item.ProductionYear) {
-            metadata = `<div class="session-metadata">${item.ProductionYear}</div>`;
-        }
+        const metaText = buildSessionMetadata(item);
+        const metadata = metaText ? `<div class="session-metadata">${metaText}</div>` : '';
 
         return `
             <div class="now-playing-session">
@@ -117,10 +101,4 @@ export class JellyfinNowPlaying extends BaseComponent {
         `);
     }
 
-    escape(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
 }

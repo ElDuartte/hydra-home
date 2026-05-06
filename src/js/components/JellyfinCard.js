@@ -5,6 +5,8 @@
 
 import { BaseComponent } from './BaseComponent.js';
 import { formatBytes } from '../format.js';
+import { normalizeContainersPayload, findJellyfinContainer, extractContainerStats } from '../transforms.js';
+import { fetchJellyfin } from '../jellyfin-api.js';
 
 export class JellyfinCard extends BaseComponent {
     defaults() {
@@ -30,10 +32,10 @@ export class JellyfinCard extends BaseComponent {
         this.render();
 
         // Subscribe to containers via poller
-        this.unsubscribeContainers = this.glancesPoller.subscribe('containers', (data) => {
+        this.trackSubscription(this.glancesPoller.subscribe('containers', (data) => {
             this.containerData = data;
             this.updateRenderedContent();
-        }, 3000);
+        }, 3000));
 
         // Fetch initial Jellyfin data and start polling it
         await this.update();
@@ -67,8 +69,8 @@ export class JellyfinCard extends BaseComponent {
     async update() {
         try {
             const [systemInfo, itemCounts] = await Promise.all([
-                this.fetchJellyfin('/System/Info'),
-                this.fetchJellyfin('/Items/Counts'),
+                fetchJellyfin('/System/Info'),
+                fetchJellyfin('/Items/Counts'),
             ]);
 
             this.jellyfinData = { systemInfo, itemCounts };
@@ -86,14 +88,10 @@ export class JellyfinCard extends BaseComponent {
      */
     updateRenderedContent() {
         if (this.jellyfinData) {
-            // Extract Jellyfin container from containers list if available
             let containerData = null;
             if (this.containerData) {
-                const containers = Array.isArray(this.containerData) ? this.containerData : (this.containerData.containers || []);
-                containerData = containers.find(c => {
-                    const name = (c.name || '').toLowerCase();
-                    return name.includes('jellyfin');
-                }) || null;
+                const containers = normalizeContainersPayload(this.containerData);
+                containerData = findJellyfinContainer(containers);
             }
 
             this.renderContent({
@@ -102,19 +100,6 @@ export class JellyfinCard extends BaseComponent {
                 containerData,
             });
         }
-    }
-
-    async fetchJellyfin(endpoint) {
-        // Use server proxy to avoid CORS issues
-        // Remove leading slash if present
-        const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
-        const url = `/api/jellyfin/${cleanEndpoint}`;
-
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        return await response.json();
     }
 
     updateStatus(isOnline) {
@@ -146,9 +131,9 @@ export class JellyfinCard extends BaseComponent {
         // Container stats (from Glances)
         let containerStatsHtml = '';
         if (containerData) {
-            const cpu = containerData.cpu?.total?.toFixed(1) || '0.0';
-            const mem = formatBytes(containerData.memory?.usage || 0);
-            const uptime = containerData.uptime || '--';
+            const stats = extractContainerStats(containerData);
+            const mem = formatBytes(stats.mem);
+            const uptime = stats.uptime || '--';
             const status = containerData.status || containerData.Status;
             const isRunning = status === 'running';
 
@@ -158,7 +143,7 @@ export class JellyfinCard extends BaseComponent {
                         <span class="stat-icon">⚡</span>
                         <div class="stat-info">
                             <span class="stat-label">CPU</span>
-                            <span class="stat-value">${cpu}%</span>
+                            <span class="stat-value">${stats.cpu}%</span>
                         </div>
                     </div>
                     <div class="container-stat-item">
@@ -224,19 +209,7 @@ export class JellyfinCard extends BaseComponent {
         `;
     }
 
-    escape(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
     destroy() {
-        // Unsubscribe from containers polling
-        if (this.unsubscribeContainers) {
-            this.unsubscribeContainers();
-        }
-        // Clean up Jellyfin API polling
         super.destroy();
     }
 }

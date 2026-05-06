@@ -7,6 +7,8 @@ export class BaseComponent {
         this.container = container;
         this.options = { ...this.defaults(), ...options };
         this.intervalId = null;
+        this._subscriptions = [];
+        this._renderedHtml = null;
     }
 
     /** Override in subclass to provide default options */
@@ -35,8 +37,16 @@ export class BaseComponent {
         }
     }
 
+    /** Track a subscription cleanup function */
+    trackSubscription(unsub) {
+        this._subscriptions.push(unsub);
+        return unsub;
+    }
+
     /** Clean up the component */
     destroy() {
+        this._subscriptions.forEach(unsub => unsub());
+        this._subscriptions = [];
         if (this.intervalId) {
             clearInterval(this.intervalId);
             this.intervalId = null;
@@ -45,6 +55,8 @@ export class BaseComponent {
 
     /** Helper to set innerHTML */
     html(content) {
+        if (content === this._renderedHtml) return;
+        this._renderedHtml = content;
         this.container.innerHTML = content;
     }
 
@@ -56,5 +68,13 @@ export class BaseComponent {
     /** Helper to query all elements */
     $$(selector) {
         return this.container.querySelectorAll(selector);
+    }
+
+    /** HTML-escape a string for safe insertion */
+    escape(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 }

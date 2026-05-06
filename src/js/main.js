@@ -83,13 +83,15 @@ class Dashboard {
 
         // Jellyfin Now Playing (if enabled)
         if (config.jellyfin?.enabled) {
-            await this.initComponent('jellyfin-now-playing', JellyfinNowPlaying, {});
+            await this.initComponent('jellyfin-now-playing', JellyfinNowPlaying, {
+                updateInterval: config.intervals?.jellyfinMs,
+            });
         }
 
         // Docker containers
         await this.initComponent('docker-containers', DockerContainers, {
             glancesPoller: this.glancesPoller,
-            updateInterval: config.glances.updateInterval,
+            updateInterval: config.intervals?.glancesDefaultMs || config.glances.updateInterval,
         });
 
         // Jellyfin card (if enabled)
@@ -99,6 +101,7 @@ class Dashboard {
                 webUrl: config.jellyfin.webUrl,
                 apiKey: config.jellyfin.apiKey,
                 glancesPoller: this.glancesPoller,
+                updateInterval: config.intervals?.jellyfinMs,
             });
         }
 
@@ -106,6 +109,8 @@ class Dashboard {
         await this.initComponent('system-stats', SystemStats, {
             glancesPoller: this.glancesPoller,
             updateInterval: config.glances.updateInterval,
+            intervals: config.intervals,
+            thresholds: config.thresholds,
         });
     }
 
@@ -127,6 +132,7 @@ class Dashboard {
                 lon: weatherCity.lon,
                 timezone: clockCity.timezone,
                 units: config.location.units || 'metric',
+                updateInterval: config.intervals?.weatherMs,
             });
             await instance.init();
             this.components.push(instance);

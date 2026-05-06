@@ -4,7 +4,8 @@
  */
 
 import { BaseComponent } from './BaseComponent.js';
-import { formatBytes } from '../format.js';
+import { formatBytes, formatBytesPerSec, calcPercent } from '../format.js';
+import { deduplicateDisksByDevice, getDiskDisplayName, filterTemperatureSensors, classifyTemp, filterNetworkInterfaces, coalesceNetworkRate } from '../transforms.js';
 
 export class SystemStats extends BaseComponent {
     defaults() {
@@ -16,52 +17,50 @@ export class SystemStats extends BaseComponent {
 
     async init() {
         this.glancesPoller = this.options.glancesPoller;
-        this.unsubscribers = [];
 
         this.render();
 
         // Subscribe to Glances endpoints with the centralized poller
         // Each subscription specifies its own interval
-        this.unsubscribers.push(
+        this.trackSubscription(
             this.glancesPoller.subscribe('cpu', (data) => {
                 if (data) this.updateCpu(data);
-            }, 2000)
+            }, this.options.intervals?.cpuMs || 2000)
         );
 
-        this.unsubscribers.push(
+        this.trackSubscription(
             this.glancesPoller.subscribe('mem', (data) => {
                 if (data) this.updateRam(data);
-            }, 1000)
+            }, this.options.intervals?.memMs || 1000)
         );
 
-        this.unsubscribers.push(
+        this.trackSubscription(
             this.glancesPoller.subscribe('sensors', (data) => {
                 if (data) this.updateTemps(data);
-            }, 1000)
+            }, this.options.intervals?.memMs || 1000)
         );
 
-        this.unsubscribers.push(
+        this.trackSubscription(
             this.glancesPoller.subscribe('fs', (data) => {
                 if (data) this.updateDisks(data);
-            }, 3600000)
+            }, this.options.intervals?.diskMs || 3600000)
         );
 
-        this.unsubscribers.push(
+        this.trackSubscription(
             this.glancesPoller.subscribe('network', (data) => {
                 if (data) this.updateNetwork(data);
-            }, 3000)
+            }, this.options.intervals?.glancesDefaultMs || 3000)
         );
 
-        this.unsubscribers.push(
+        this.trackSubscription(
             this.glancesPoller.subscribe('gpu', (data) => {
                 if (data?.length > 0) this.updateGpu(data);
-            }, 3000)
+            }, this.options.intervals?.glancesDefaultMs || 3000)
         );
     }
 
     destroy() {
-        this.unsubscribers.forEach(unsubscribe => unsubscribe());
-        this.unsubscribers = [];
+        super.destroy();
     }
 
     render() {
@@ -120,7 +119,7 @@ export class SystemStats extends BaseComponent {
         const percent = Math.round(data.total || 0);
         this.$('[data-cpu-value]').textContent = `${percent}%`;
         this.$('[data-cpu-bar]').style.width = `${percent}%`;
-        this.$('[data-cpu-bar]').classList.toggle('warning', percent > 80);
+        this.$('[data-cpu-bar]').classList.toggle('warning', percent > (this.options.thresholds?.cpuWarning ?? 80));
 
         const details = [];
         if (data.user) details.push(`User: ${data.user.toFixed(1)}%`);
@@ -131,11 +130,11 @@ export class SystemStats extends BaseComponent {
 
     updateRam(data) {
         const usedBytes = data.total - (data.available || data.free || 0);
-        const percent = data.total > 0 ? Math.round((usedBytes / data.total) * 100) : 0;
+        const percent = calcPercent(usedBytes, data.total);
 
         this.$('[data-ram-value]').textContent = `${percent}%`;
         this.$('[data-ram-bar]').style.width = `${percent}%`;
-        this.$('[data-ram-bar]').classList.toggle('warning', percent > 85);
+        this.$('[data-ram-bar]').classList.toggle('warning', percent > (this.options.thresholds?.ramWarning ?? 85));
         this.$('[data-ram-details]').textContent = `${formatBytes(usedBytes)} / ${formatBytes(data.total)}`;
     }
 
@@ -145,18 +144,7 @@ export class SystemStats extends BaseComponent {
             return;
         }
 
-        // Group by device to show only one entry per physical disk
-        // This avoids showing multiple bind mounts from Docker containers
-        const deviceMap = new Map();
-        data.forEach(d => {
-            const device = d.device_name;
-            // Keep only the first mount for each unique device
-            if (device && !deviceMap.has(device)) {
-                deviceMap.set(device, d);
-            }
-        });
-
-        const uniqueDisks = Array.from(deviceMap.values());
+        const uniqueDisks = deduplicateDisksByDevice(data);
 
         // Calculate combined disk usage
         let totalSpace = 0;
@@ -165,7 +153,7 @@ export class SystemStats extends BaseComponent {
             totalSpace += d.size || d.total || 0;
             totalUsed += d.used || 0;
         });
-        const combinedPercent = totalSpace > 0 ? Math.round((totalUsed / totalSpace) * 100) : 0;
+        const combinedPercent = calcPercent(totalUsed, totalSpace);
 
         // Update disk card header with combined usage
         const diskCard = this.$('#disk-card');
@@ -187,23 +175,8 @@ export class SystemStats extends BaseComponent {
                 const device = d.device_name || '';
                 const total = d.size || d.total || 0;
                 const used = d.used || 0;
-                const percent = total > 0 ? Math.round((used / total) * 100) : 0;
-
-                // Generate a friendly disk name
-                let diskName;
-                if (mount === '/' || mount === '') {
-                    // Primary/root filesystem
-                    diskName = 'System Drive';
-                } else if (mount.startsWith('/home')) {
-                    diskName = 'Home';
-                } else if (mount.startsWith('/mnt/')) {
-                    // Extract mount name from /mnt/xxx
-                    diskName = mount.split('/')[2] || 'Drive';
-                } else {
-                    // Extract device name from path (e.g., /dev/sda2 -> sda2)
-                    const deviceMatch = device.match(/\/dev\/(.+)$/);
-                    diskName = deviceMatch ? deviceMatch[1].toUpperCase() : `Drive ${index + 1}`;
-                }
+                const percent = calcPercent(used, total);
+                const diskName = getDiskDisplayName(mount, device, index);
 
                 return `
                     <div class="disk-item">
@@ -212,7 +185,7 @@ export class SystemStats extends BaseComponent {
                             <span class="disk-usage">${formatBytes(used)} / ${formatBytes(total)}</span>
                         </div>
                         <div class="stat-bar">
-                            <div class="stat-bar-fill disk ${percent > 85 ? 'warning' : ''}" style="width:${percent}%"></div>
+                            <div class="stat-bar-fill disk ${percent > (this.options.thresholds?.diskWarning ?? 85) ? 'warning' : ''}" style="width:${percent}%"></div>
                         </div>
                     </div>
                 `;
@@ -227,20 +200,19 @@ export class SystemStats extends BaseComponent {
             return;
         }
 
-        const temps = data.filter(s => {
-            const type = (s.type || '').toLowerCase();
-            const unit = (s.unit || '').toLowerCase();
-            return type.includes('temperature') || unit === 'c' || unit === '°c';
-        });
+        const temps = filterTemperatureSensors(data);
 
         if (temps.length === 0) {
             this.$('[data-temp-list]').innerHTML = '<div class="no-data">No sensors</div>';
             return;
         }
 
+        const tempWarning = this.options.thresholds?.tempWarning ?? 70;
+        const tempCritical = this.options.thresholds?.tempCritical ?? 85;
+
         const html = temps.map(s => {
             const temp = Math.round(s.value || 0);
-            const cls = temp > 85 ? 'critical' : temp > 70 ? 'warning' : '';
+            const cls = classifyTemp(temp, tempWarning, tempCritical);
             return `
                 <div class="temp-item ${cls}">
                     <span class="temp-label">${s.label || s.name || 'Sensor'}</span>
@@ -268,11 +240,7 @@ export class SystemStats extends BaseComponent {
     }
 
     updateNetwork(data) {
-        const interfaces = data.filter(i =>
-            !i.interface_name.startsWith('lo') &&
-            !i.interface_name.startsWith('br-') &&
-            !i.interface_name.startsWith('veth')
-        );
+        const interfaces = filterNetworkInterfaces(data);
 
         if (interfaces.length === 0) {
             this.$('[data-network-list]').innerHTML = '<div class="no-data">No interfaces</div>';
@@ -280,8 +248,8 @@ export class SystemStats extends BaseComponent {
         }
 
         const html = interfaces.map(i => {
-            const rx = this.formatSpeed(i.bytes_recv_rate_per_sec || i.rx || 0);
-            const tx = this.formatSpeed(i.bytes_sent_rate_per_sec || i.tx || 0);
+            const rx = formatBytesPerSec(coalesceNetworkRate(i, 'rx'));
+            const tx = formatBytesPerSec(coalesceNetworkRate(i, 'tx'));
             return `
                 <div class="network-item">
                     <span class="network-name">${i.interface_name}</span>
@@ -294,16 +262,5 @@ export class SystemStats extends BaseComponent {
         }).join('');
 
         this.$('[data-network-list]').innerHTML = html;
-    }
-
-    formatSpeed(bps) {
-        if (!bps) return '0 B/s';
-        const units = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
-        let i = 0;
-        while (bps >= 1024 && i < units.length - 1) {
-            bps /= 1024;
-            i++;
-        }
-        return `${bps.toFixed(1)} ${units[i]}`;
     }
 }

@@ -34,5 +34,22 @@
 
   "jellyfin": {
     "enabled": true
+  },
+
+  "intervals": {
+    "weatherMs": 1800000,
+    "jellyfinMs": 5000,
+    "glancesDefaultMs": 3000,
+    "cpuMs": 2000,
+    "memMs": 1000,
+    "diskMs": 3600000
+  },
+
+  "thresholds": {
+    "cpuWarning": 80,
+    "ramWarning": 85,
+    "diskWarning": 85,
+    "tempWarning": 70,
+    "tempCritical": 85
   }
 }
