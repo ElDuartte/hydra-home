@@ -30,7 +30,7 @@ export class BaseComponent {
 
     /** Start periodic updates if interval is set */
     startUpdates() {
-        const interval = this.options.updateInterval;
+        const interval = this.options.updateInterval || this.defaults().updateInterval;
         if (interval && interval > 0) {
             this.intervalId = setInterval(() => this.update(), interval);
         }
