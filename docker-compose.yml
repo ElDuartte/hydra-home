@@ -38,5 +38,5 @@ services:
     # http://192.168.1.58:42070/
     image: ghcr.io/alam00000/bentopdf:latest
     ports:
-      - '42070:8080'
+      - '42070:42070'
     restart: unless-stopped
