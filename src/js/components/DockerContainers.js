@@ -119,7 +119,6 @@ export class DockerContainers extends BaseComponent {
                 <div class="container-stats">
                     ${statsHtml}
                 </div>
-                ${metaHtml}
             </div>
         `;
     }
