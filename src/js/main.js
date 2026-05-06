@@ -115,17 +115,31 @@ class Dashboard {
     }
 
     async initCityCards(config) {
-        // Iterate weather cities and initialize cards from config
+        const container = document.getElementById('city-cards-container');
+        if (!container) return;
+
+        // Generate cards from config
         for (const weatherCity of config.weatherCities) {
             const slug = this.slugify(weatherCity.name);
             const clockCity = config.clockCities.find(c => c.name === weatherCity.name);
 
             if (!clockCity) continue;
 
-            // Find card element by data-city-slug attribute
-            const cardEl = document.querySelector(`[data-city-slug="${slug}"]`);
-            if (!cardEl) continue;
+            // Create card element dynamically
+            const cardEl = document.createElement('div');
+            cardEl.className = 'city-card';
+            cardEl.id = `city-card-${slug}`;
+            cardEl.dataset.citySlug = slug;
+            cardEl.innerHTML = `
+                <div class="city-card-header">${this.escape(weatherCity.name)}</div>
+                <div class="city-card-content">
+                    <div class="city-time" data-city-time="${slug}"></div>
+                    <div class="city-weather" data-city-weather="${slug}"></div>
+                </div>
+            `;
+            container.appendChild(cardEl);
 
+            // Initialize component
             const instance = new CityCard(cardEl, {
                 city: weatherCity.name,
                 lat: weatherCity.lat,
@@ -137,6 +151,13 @@ class Dashboard {
             await instance.init();
             this.components.push(instance);
         }
+    }
+
+    escape(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     /**
