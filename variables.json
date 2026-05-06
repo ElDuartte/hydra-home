@@ -8,15 +8,13 @@
   },
 
   "weatherCities": [
-    { "name": "Bogotá", "lat": 4.6097, "lon": -74.0817 },
-    { "name": "Los Angeles", "lat": 34.0522, "lon": -118.2437 }
+    { "name": "Los Angeles", "lat": 34.0522, "lon": -118.2437 },
+    { "name": "Bogotá", "lat": 4.6097, "lon": -74.0817 }
   ],
 
   "clockCities": [
-    { "name": "London", "timezone": "Europe/London" },
-    { "name": "New York", "timezone": "America/New_York" },
-    { "name": "Bogotá", "timezone": "America/Bogota" },
-    { "name": "Los Angeles", "timezone": "America/Los_Angeles" }
+    { "name": "Los Angeles", "timezone": "America/Los_Angeles" },
+    { "name": "Bogotá", "timezone": "America/Bogota" }
   ],
 
   "clock": {
